@@ -185,20 +185,19 @@
     <!-- MAIN APP CONTAINER -->
     <div class="min-h-screen flex bg-slateBg w-full">
 
+        <!-- Mobile Sidebar Overlay Backdrop -->
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-40 transition-opacity duration-300 hidden opacity-0"></div>
+
         <!-- LEFT SIDEBAR -->
-        <aside id="sidebar" class="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-white border-r border-slate-100 sidebar-transition w-64">
+        <aside id="sidebar" class="flex flex-col fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-slate-100 sidebar-transition w-64 transform -translate-x-full">
             <!-- Sidebar Header -->
-            <div class="h-16 flex items-center justify-between px-6 border-b border-slate-50">
+            <div class="h-16 flex items-center px-6 border-b border-slate-50">
                 <div class="flex items-center gap-3 logo-container sidebar-transition">
                     <div class="w-8 h-8 rounded-xl bg-bpsBlue flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-bpsBlue/20">
                         <i class="fa-solid fa-chart-pie text-sm"></i>
                     </div>
                     <span class="font-extrabold text-base text-slate-800 tracking-wider">SIKEMAS</span>
                 </div>
-                <!-- Collapse Button -->
-                <button onclick="toggleSidebar()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-bpsBlue hover:bg-slate-50 transition-all">
-                    <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-left"></i>
-                </button>
             </div>
 
             <!-- Sidebar Navigation -->
@@ -242,21 +241,28 @@
 
             <!-- TOP HEADER -->
             <header class="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm shadow-slate-100/30">
-                <!-- Mobile Brand -->
-                <div class="flex items-center gap-3 lg:hidden">
-                    <div class="w-8 h-8 rounded-xl bg-bpsBlue flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-bpsBlue/20">
-                        <i class="fa-solid fa-chart-pie text-sm"></i>
+                <div class="flex items-center gap-4">
+                    <!-- Hamburger Menu Button -->
+                    <button id="header-toggle-btn" onclick="toggleSidebar()" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-500 hover:text-bpsBlue hover:bg-slate-50 border border-slate-100 shadow-sm transition-all focus:outline-none active:scale-95 duration-200">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    
+                    <!-- Mobile Brand -->
+                    <div class="flex items-center gap-3 lg:hidden">
+                        <div class="w-8 h-8 rounded-xl bg-bpsBlue flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-bpsBlue/20">
+                            <i class="fa-solid fa-chart-pie text-sm"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-extrabold text-base text-slate-800 tracking-wider">SIKEMAS</h1>
+                            <p class="text-[9px] text-slate-400 font-medium -mt-0.5">Dashboard Monitoring</p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 class="font-extrabold text-base text-slate-800 tracking-wider">SIKEMAS</h1>
-                        <p class="text-[9px] text-slate-400 font-medium -mt-0.5">Dashboard Monitoring</p>
-                    </div>
-                </div>
 
-                <!-- Desktop Title -->
-                <div class="hidden lg:block">
-                    <h2 class="text-xs font-bold text-slate-700 uppercase tracking-wider">SIKEMAS - Dashboard Monitoring</h2>
-                    <p class="text-[10px] text-slate-400 font-semibold mt-0.5">BPS Provinsi Kalimantan Barat</p>
+                    <!-- Desktop Title -->
+                    <div class="hidden lg:block">
+                        <h2 class="text-xs font-bold text-slate-700 uppercase tracking-wider">SIKEMAS - Dashboard Monitoring</h2>
+                        <p class="text-[10px] text-slate-400 font-semibold mt-0.5">BPS Provinsi Kalimantan Barat</p>
+                    </div>
                 </div>
 
                 <!-- Live Clock, Refresh Controls, spreadsheet link -->
@@ -683,6 +689,9 @@
         let allRecords = [];
         let spreadsheetUrl = "#";
 
+        // Sidebar State
+        let sidebarOpen = window.innerWidth >= 1024;
+
         // Auto Refresh Interval ID
         let autoRefreshInterval = null;
 
@@ -744,6 +753,7 @@
 
         // ================= PAGE INITIALIZATION =================
         window.onload = function() {
+            applySidebarState();
             startLiveClock();
             loadSheetUrl();
             reloadData(true); // Load data initially
@@ -1543,44 +1553,98 @@
                 btn.classList.remove('text-slate-400', 'hover:text-slate-700', 'hover:bg-slate-50/50');
                 btn.classList.add('text-bpsBlue', 'bg-blue-50/50');
             }
-        }
 
-        // Sidebar Collapse/Expand Toggle
-        let sidebarCollapsed = false;
-        function toggleSidebar() {
-            sidebarCollapsed = !sidebarCollapsed;
-            const sidebar = document.getElementById('sidebar');
-            const mainWrapper = document.getElementById('main-wrapper');
-            const toggleIcon = document.getElementById('sidebar-toggle-icon');
-            
-            if (sidebarCollapsed) {
-                sidebar.classList.remove('w-64');
-                sidebar.classList.add('w-20');
-                mainWrapper.classList.remove('lg:pl-64');
-                mainWrapper.classList.add('lg:pl-20');
-                toggleIcon.className = 'fa-solid fa-chevron-right';
-                
-                // Hide text labels
-                const texts = document.querySelectorAll('.nav-text');
-                texts.forEach(t => t.classList.add('opacity-0', 'pointer-events-none', 'hidden'));
-                const logo = document.querySelectorAll('.logo-container');
-                logo.forEach(l => l.classList.add('opacity-0', 'hidden'));
-            } else {
-                sidebar.classList.remove('w-20');
-                sidebar.classList.add('w-64');
-                mainWrapper.classList.remove('lg:pl-20');
-                mainWrapper.classList.add('lg:pl-64');
-                toggleIcon.className = 'fa-solid fa-chevron-left';
-                
-                // Show text labels
-                setTimeout(() => {
-                    const texts = document.querySelectorAll('.nav-text');
-                    texts.forEach(t => t.classList.remove('opacity-0', 'pointer-events-none', 'hidden'));
-                    const logo = document.querySelectorAll('.logo-container');
-                    logo.forEach(l => l.classList.remove('opacity-0', 'hidden'));
-                }, 100);
+            // Close sidebar on mobile after selecting a menu item
+            if (window.innerWidth < 1024) {
+                sidebarOpen = false;
+                applySidebarState();
             }
         }
+
+        // Apply sidebar state based on resolution & sidebarOpen status
+        function applySidebarState() {
+            const sidebar = document.getElementById('sidebar');
+            const mainWrapper = document.getElementById('main-wrapper');
+            const overlay = document.getElementById('sidebar-overlay');
+            const toggleBtnIcon = document.querySelector('#header-toggle-btn i');
+            const isMobile = window.innerWidth < 1024;
+
+            if (isMobile) {
+                // Mobile layout - sidebar acts as overlay/off-canvas
+                mainWrapper.classList.remove('lg:pl-64', 'lg:pl-0', 'lg:pl-20');
+                mainWrapper.classList.add('pl-0');
+
+                if (sidebarOpen) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebar.classList.add('translate-x-0', 'shadow-2xl');
+                    
+                    // Show backdrop overlay
+                    overlay.classList.remove('hidden');
+                    setTimeout(() => {
+                        overlay.classList.add('opacity-100');
+                    }, 10);
+                    
+                    if (toggleBtnIcon) toggleBtnIcon.className = 'fa-solid fa-xmark text-lg';
+                } else {
+                    sidebar.classList.remove('translate-x-0', 'shadow-2xl');
+                    sidebar.classList.add('-translate-x-full');
+                    
+                    // Hide backdrop overlay
+                    overlay.classList.remove('opacity-100');
+                    setTimeout(() => {
+                        if (!sidebarOpen) {
+                            overlay.classList.add('hidden');
+                        }
+                    }, 300);
+                    
+                    if (toggleBtnIcon) toggleBtnIcon.className = 'fa-solid fa-bars text-lg';
+                }
+            } else {
+                // Desktop/Laptop layout - sidebar collapses/expands and pushes content
+                overlay.classList.add('hidden');
+                overlay.classList.remove('opacity-100');
+                sidebar.classList.remove('shadow-2xl');
+                
+                // Clean up mobile padding
+                mainWrapper.classList.remove('pl-0');
+
+                if (sidebarOpen) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebar.classList.add('translate-x-0');
+                    mainWrapper.classList.remove('lg:pl-0');
+                    mainWrapper.classList.add('lg:pl-64');
+                    if (toggleBtnIcon) toggleBtnIcon.className = 'fa-solid fa-bars text-lg';
+                } else {
+                    sidebar.classList.remove('translate-x-0');
+                    sidebar.classList.add('-translate-x-full');
+                    mainWrapper.classList.remove('lg:pl-64');
+                    mainWrapper.classList.add('lg:pl-0');
+                    if (toggleBtnIcon) toggleBtnIcon.className = 'fa-solid fa-bars text-lg';
+                }
+            }
+        }
+
+        // Toggle Sidebar state
+        function toggleSidebar() {
+            sidebarOpen = !sidebarOpen;
+            applySidebarState();
+        }
+
+        // Handle window resizing to keep layout consistent
+        let lastWidth = window.innerWidth;
+        window.addEventListener('resize', function() {
+            if (window.innerWidth !== lastWidth) {
+                const wasMobile = lastWidth < 1024;
+                const isMobile = window.innerWidth < 1024;
+                lastWidth = window.innerWidth;
+
+                if (wasMobile !== isMobile) {
+                    // Reset open state based on breakpoint transition
+                    sidebarOpen = !isMobile;
+                }
+                applySidebarState();
+            }
+        });
 
         // Custom Confirm Dialog Callers
         function showCustomConfirm(message, callback) {
