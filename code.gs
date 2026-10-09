@@ -1,7 +1,7 @@
 /**
  * SIKEMAS - Sistem Keterangan Keluar Masuk Pegawai
  * Copyright Tim Umum dan Humas BPS Provinsi Kalimantan Barat @2026
- * * BACKEND LOGIC (Code.gs)
+ * BACKEND LOGIC (Code.gs)
  */
 
 function doGet(e) {
@@ -42,8 +42,8 @@ function getSheet() {
   let sheet = doc.getSheetByName("Log_SIKEMAS");
   if (!sheet) {
     sheet = doc.insertSheet("Log_SIKEMAS");
-    sheet.appendRow(["Nama Pegawai", "Hari", "Tanggal", "Waktu Keluar", "Waktu Kembali", "Keterangan", "Timestamp"]);
-    const headerRange = sheet.getRange("A1:G1");
+    sheet.appendRow(["Nama Pegawai", "Hari", "Tanggal", "Waktu Keluar", "Waktu Kembali", "Keterangan", "Timestamp", "SessionID"]);
+    const headerRange = sheet.getRange("A1:H1");
     headerRange.setFontWeight("bold").setBackground("#005aa9").setFontColor("#ffffff").setHorizontalAlignment("center");
     sheet.setFrozenRows(1);
   }
@@ -51,14 +51,13 @@ function getSheet() {
 }
 
 /**
- * Mengambil daftar nama pegawai dari sheet "User" kolom A secara dinamis
+ * Mengambil daftar nama pegawai, tim kerja, NIP, dan role dari sheet "User"
+ * (Kolom A: Nama, Kolom B: Tim Kerja, Kolom C: NIP, Kolom D: Password, Kolom E: Role)
  */
 function getEmployeeNames() {
   try {
     let doc;
-    try {
-      doc = SpreadsheetApp.getActiveSpreadsheet();
-    } catch (e) { doc = null; }
+    try { doc = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) { doc = null; }
     
     if (!doc) {
       const properties = PropertiesService.getScriptProperties();
@@ -68,32 +67,112 @@ function getEmployeeNames() {
       }
     }
     
-    if (!doc) return { success: true, data: [] };
+    if (!doc) return { success: true, data: [], names: [] };
 
     let sheet = doc.getSheetByName("User");
     if (!sheet) {
       sheet = doc.insertSheet("User");
-      sheet.appendRow(["Nama"]);
-      sheet.appendRow(["Azhari"]);
-      sheet.appendRow(["Budi Santoso"]);
-      sheet.appendRow(["Dewi Lestari"]);
-      sheet.getRange("A1").setFontWeight("bold").setBackground("#e2e8f0");
+      sheet.appendRow(["Nama", "Tim Kerja", "NIP", "Password", "Role"]);
+      sheet.appendRow(["Azhari", "Tim IPDS", "199501012020011001", "admin123", "Admin"]);
+      sheet.appendRow(["Budi Santoso", "Tim Stat. Distribusi", "199002022015021002", "supervisor123", "Supervisor"]);
+      sheet.appendRow(["Dewi Lestari", "Tim Stat. Sosial", "199203032018032003", "ketua123", "Ketua Tim"]);
+      sheet.getRange("A1:E1").setFontWeight("bold").setBackground("#e2e8f0");
+    } else {
+      // Pastikan header 5 kolom
+      const headerValues = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 5)).getValues()[0];
+      if (!headerValues[2] || String(headerValues[2]).trim() === "") {
+        sheet.getRange(1, 1, 1, 5).setValues([["Nama", "Tim Kerja", "NIP", "Password", "Role"]]);
+        sheet.getRange(1, 1, 1, 5).setFontWeight("bold").setBackground("#e2e8f0");
+      }
     }
 
     const lastRow = sheet.getLastRow();
-    if (lastRow <= 1) return { success: true, data: [] };
+    if (lastRow <= 1) return { success: true, data: [], names: [] };
 
-    const range = sheet.getRange(2, 1, lastRow - 1, 1);
+    const maxCols = Math.max(sheet.getLastColumn(), 5);
+    const range = sheet.getRange(2, 1, lastRow - 1, maxCols);
     const values = range.getValues();
 
-    const names = values
-      .map(row => String(row[0]).trim())
-      .filter(name => name.length > 0);
+    const users = values
+      .map(row => {
+        const nama = String(row[0] || "").trim();
+        const timKerja = String(row[1] || "").trim() || "Lainnya";
+        const nip = String(row[2] || "").trim();
+        const role = String(row[4] || "").trim() || "Ketua Tim";
+        return { nama: nama, timKerja: timKerja, nip: nip, role: role };
+      })
+      .filter(item => item.nama.length > 0);
+
+    const names = users.map(u => u.nama);
       
-    return { success: true, data: names };
+    return { success: true, data: users, names: names };
   } catch (error) {
     Logger.log("Error getEmployeeNames: " + error.toString());
-    return { success: false, message: error.toString(), data: [] };
+    return { success: false, message: error.toString(), data: [], names: [] };
+  }
+}
+
+/**
+ * Autentikasi Login Pengguna berdasarkan NIP (Kolom C), Password (Kolom D), dan Role (Kolom E)
+ */
+function loginUser(data) {
+  try {
+    const inputNip = String(data.nip || "").trim();
+    const inputPassword = String(data.password || "").trim();
+    const inputRole = String(data.role || "").trim();
+    
+    if (!inputNip || !inputPassword || !inputRole) {
+      return { success: false, message: "NIP, Password, dan Role wajib diisi!" };
+    }
+
+    let doc;
+    try { doc = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) { doc = null; }
+    if (!doc) {
+      const properties = PropertiesService.getScriptProperties();
+      let sheetId = properties.getProperty("SPREADSHEET_ID");
+      if (sheetId) {
+        try { doc = SpreadsheetApp.openById(sheetId); } catch(e) { doc = null; }
+      }
+    }
+    if (!doc) return { success: false, message: "Database Spreadsheet tidak ditemukan." };
+
+    let sheet = doc.getSheetByName("User");
+    if (!sheet) {
+      getEmployeeNames();
+      sheet = doc.getSheetByName("User");
+    }
+
+    const lastRow = sheet.getLastRow();
+    if (lastRow <= 1) return { success: false, message: "Data pengguna tidak ditemukan di database." };
+
+    const range = sheet.getRange(2, 1, lastRow - 1, 5);
+    const values = range.getValues();
+
+    for (let i = 0; i < values.length; i++) {
+      const nama = String(values[i][0] || "").trim();
+      const timKerja = String(values[i][1] || "").trim() || "Lainnya";
+      const nip = String(values[i][2] || "").trim();
+      const password = String(values[i][3] || "").trim();
+      const role = String(values[i][4] || "").trim();
+
+      if (nip === inputNip && password === inputPassword && role.toLowerCase() === inputRole.toLowerCase()) {
+        return {
+          success: true,
+          message: "Login berhasil!",
+          user: {
+            nama: nama,
+            timKerja: timKerja,
+            nip: nip,
+            role: role
+          }
+        };
+      }
+    }
+
+    return { success: false, message: "NIP, Password, atau Role tidak sesuai!" };
+  } catch (error) {
+    Logger.log("Error loginUser: " + error.toString());
+    return { success: false, message: "Gagal login: " + error.toString() };
   }
 }
 
@@ -176,7 +255,7 @@ function updateTimeSafe(sessionId, employeeName, type, waktu) {
   }
 }
 
-// Menghapus baris data di database ketika sesi dibatalkan / direset oleh pengguna secara aman
+// Menghapus baris data di database ketika sesi dibatalkan / direset oleh pengguna secara aman (presisi hanya baris pegawai tersebut)
 function deleteRecordSafe(sessionId, employeeName) {
   try {
     const sheet = getSheet();
@@ -186,7 +265,7 @@ function deleteRecordSafe(sessionId, employeeName) {
       return { success: false, message: "Sesi aktif tidak ditemukan atau sudah dihapus." };
     }
     
-    // Melakukan penghapusan baris pada spreadsheet secara fisik
+    // Melakukan penghapusan baris pada spreadsheet secara fisik hanya pada baris sesi pegawai bersangkutan
     sheet.deleteRow(rowIndex);
     return { success: true, message: "Sesi berhasil dibatalkan dan rencana kegiatan dihapus dari database SIKEMAS secara permanen." };
   } catch (error) {
@@ -225,13 +304,15 @@ function getRecordsInternal(employeeName) {
     const sheet = getSheet();
     const range = sheet.getDataRange();
     const rows = range.getValues();
-    const displayRows = range.getDisplayValues(); // Mengambil representasi teks asli dari layar sheet
+    const displayRows = range.getDisplayValues();
     
     if (rows.length <= 1) return [];
+
+    // Auto fix unreturned sessions past 24:00 WIB
+    autoFixExpiredSessions(sheet, rows, displayRows);
     
     const dataRows = [];
     for (let i = 1; i < rows.length; i++) {
-      // Filter hanya data milik pegawai yang dipilih
       if (String(rows[i][0]).trim() === employeeName.trim()) {
         dataRows.push({
           rawRow: rows[i],
@@ -240,7 +321,6 @@ function getRecordsInternal(employeeName) {
       }
     }
     
-    // Urutkan berdasarkan Timestamp descending (terbaru di atas)
     dataRows.sort((a, b) => new Date(b.rawRow[6]) - new Date(a.rawRow[6]));
     
     return dataRows.map(item => {
@@ -260,8 +340,8 @@ function getRecordsInternal(employeeName) {
         nama: String(raw[0] || "-"),
         hari: String(raw[1] || "-"),
         tanggal: String(formattedDate || "-"),
-        waktuKeluar: String(disp[3] || "-"), // Menggunakan teks display murni
-        waktuKembali: String(disp[4] || "-"), // Menggunakan teks display murni
+        waktuKeluar: String(disp[3] || "-"),
+        waktuKembali: String(disp[4] || "-"),
         keterangan: String(raw[5] || "-")
       };
     });
@@ -353,7 +433,11 @@ function doPost(e) {
 
   try {
     switch (action) {
+      case 'loginUser':
+        result = loginUser(requestData);
+        break;
       case 'getEmployeeNames':
+      case 'getUsersData':
         result = getEmployeeNames();
         break;
       case 'saveRecord':
@@ -397,6 +481,55 @@ function doPost(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+/**
+ * Otomatis set Jam Kembali ke 16:00 bagi sesi yang lupa ditekan tombol kembali setelah 24.00 WIB hari tersebut
+ */
+function autoFixExpiredSessions(sheet, rows, displayRows) {
+  if (!rows || rows.length <= 1) return;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Awal hari berjalan
+  
+  for (let i = 1; i < rows.length; i++) {
+    const raw = rows[i];
+    const disp = displayRows ? displayRows[i] : raw;
+    const waktuKeluar = String(disp[3] || "-").trim();
+    const waktuKembali = String(disp[4] || "-").trim();
+    
+    if (waktuKeluar !== "-" && waktuKembali === "-") {
+      let rawDate = raw[2];
+      let recDate = null;
+      
+      if (rawDate instanceof Date) {
+        recDate = new Date(rawDate);
+        recDate.setHours(0, 0, 0, 0);
+      } else if (typeof rawDate === 'string' && rawDate.includes('-')) {
+        const cleanDate = rawDate.split('T')[0];
+        const parts = cleanDate.split('-');
+        if (parts.length === 3) {
+          if (parts[0].length === 4) { // YYYY-MM-DD
+            recDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+          } else { // DD-MM-YYYY
+            recDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+          }
+        }
+      }
+      
+      if (recDate && recDate.getTime() < today.getTime()) {
+        // Sesi berasal dari hari sebelum hari berjalan (sudah melewati 24.00 WIB). Set otomatis Jam Kembali = 16:00!
+        try {
+          sheet.getRange(i + 1, 5).setValue("'16:00");
+          rows[i][4] = "16:00";
+          if (displayRows && displayRows[i]) {
+            displayRows[i][4] = "16:00";
+          }
+        } catch(e) {
+          Logger.log("Error autoFixExpiredSessions row " + (i+1) + ": " + e.toString());
+        }
+      }
+    }
+  }
+}
+
 // Mengambil semua riwayat dari database untuk Dashboard Monitoring
 function getAllRecords() {
   try {
@@ -406,6 +539,9 @@ function getAllRecords() {
     const displayRows = range.getDisplayValues();
     
     if (rows.length <= 1) return { success: true, data: [] };
+
+    // Jalankan auto-fix untuk sesi terlewat 24.00 WIB
+    autoFixExpiredSessions(sheet, rows, displayRows);
     
     const records = [];
     for (let i = 1; i < rows.length; i++) {

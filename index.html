@@ -95,6 +95,34 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+
+        /* Animated Logo & Login Elements */
+        @keyframes floatBg {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(3deg); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.08); }
+        }
+
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .login-bg-float {
+            animation: floatBg 6s ease-in-out infinite;
+        }
+
+        .login-pulse-glow {
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        .login-rotate-ring {
+            animation: rotateRing 12s linear infinite;
+        }
     </style>
 </head>
 
@@ -182,6 +210,119 @@
         </div>
     </div>
 
+    <!-- ================= LOGIN OVERLAY SCREEN ================= -->
+    <div id="login-screen" class="fixed inset-0 z-[10000] bg-slate-950 flex items-center justify-center p-4 overflow-y-auto">
+        <!-- Background Glowing Circles -->
+        <div class="absolute w-[500px] h-[500px] bg-bpsBlue/20 rounded-full blur-[120px] top-[-100px] left-[-100px] pointer-events-none login-pulse-glow"></div>
+        <div class="absolute w-[400px] h-[400px] bg-bpsOrange/20 rounded-full blur-[100px] bottom-[-50px] right-[-50px] pointer-events-none login-pulse-glow" style="animation-delay: 1.5s;"></div>
+
+        <div class="relative w-full max-w-md bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-100 login-bg-float">
+            <!-- SIKEMAS Animated Logo Header -->
+            <div class="flex flex-col items-center text-center mb-6">
+                <div class="relative w-24 h-24 mb-4 flex items-center justify-center">
+                    <!-- Rotating Decorative Ring -->
+                    <div class="absolute inset-0 rounded-full border-2 border-dashed border-bpsOrange/60 login-rotate-ring"></div>
+                    <!-- Outer Glowing Ring -->
+                    <div class="absolute inset-1 rounded-full bg-gradient-to-tr from-bpsBlue to-bpsOrange opacity-80 blur-sm login-pulse-glow"></div>
+                    <!-- Logo Circle Container -->
+                    <div class="relative w-20 h-20 rounded-full bg-slate-900 border border-slate-700 flex flex-col items-center justify-center shadow-inner">
+                        <i class="fa-solid fa-building-user text-2xl text-bpsOrange mb-0.5"></i>
+                        <span class="text-[9px] font-black text-white tracking-widest uppercase">SIKEMAS</span>
+                    </div>
+                </div>
+                <h2 class="text-xl font-extrabold tracking-tight text-white">Monitoring SIKEMAS</h2>
+                <p class="text-xs text-slate-400 mt-1 font-medium">BPS Provinsi Kalimantan Barat</p>
+                <div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-semibold">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping"></span>
+                    Portal Autentikasi Pengguna
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                <!-- NIP Field (Kolom C) -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">NIP (Kolom C)</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-id-card text-xs"></i>
+                        </div>
+                        <input id="login-nip" type="text" required placeholder="Masukkan NIP Pegawai..."
+                            class="w-full pl-10 pr-4 py-3 bg-slate-950/70 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-bpsBlue focus:ring-1 focus:ring-bpsBlue transition-all font-mono" />
+                    </div>
+                </div>
+
+                <!-- Password Field (Kolom D) -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Password (Kolom D)</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-lock text-xs"></i>
+                        </div>
+                        <input id="login-password" type="password" required placeholder="Masukkan Password..."
+                            class="w-full pl-10 pr-10 py-3 bg-slate-950/70 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-bpsBlue focus:ring-1 focus:ring-bpsBlue transition-all" />
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-200">
+                            <i id="pwd-eye-icon" class="fa-solid fa-eye text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Role Field (Kolom E) -->
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Role Hak Akses (Kolom E)</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-user-shield text-xs"></i>
+                        </div>
+                        <select id="login-role" required
+                            class="w-full pl-10 pr-4 py-3 bg-slate-950/70 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-bpsBlue focus:ring-1 focus:ring-bpsBlue transition-all cursor-pointer font-semibold">
+                            <option value="Ketua Tim" class="bg-slate-900 text-white">Ketua Tim (Hak Akses Tim Kerja)</option>
+                            <option value="Supervisor" class="bg-slate-900 text-white">Supervisor (Hak Akses Penuh)</option>
+                            <option value="Admin" class="bg-slate-900 text-white">Admin (Hak Akses Penuh)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Login Error Alert Box -->
+                <div id="login-error-box" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs leading-relaxed flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation text-sm flex-shrink-0"></i>
+                    <span id="login-error-msg">NIP, Password, atau Role tidak valid.</span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="btn-login-submit"
+                    class="w-full bg-gradient-to-r from-bpsBlue to-blue-600 hover:from-blue-600 hover:to-bpsBlue text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg shadow-bpsBlue/30 hover:shadow-bpsBlue/50 active:scale-[0.98] transition-all text-xs flex items-center justify-center gap-2 mt-2">
+                    <span>Masuk ke Dashboard</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <!-- Quick Demo Helper -->
+            <div class="mt-6 pt-5 border-t border-slate-800/80">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">Petunjuk Pengujian Cepat Akun Demo</p>
+                <div class="grid grid-cols-3 gap-2 text-center">
+                    <button type="button" onclick="fillQuickDemo('Admin')" class="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-all text-[10px]">
+                        <span class="block font-bold text-amber-400">Admin</span>
+                        <span class="text-[9px] text-slate-400">All Access</span>
+                    </button>
+                    <button type="button" onclick="fillQuickDemo('Supervisor')" class="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-all text-[10px]">
+                        <span class="block font-bold text-blue-400">Supervisor</span>
+                        <span class="text-[9px] text-slate-400">All Access</span>
+                    </button>
+                    <button type="button" onclick="fillQuickDemo('Ketua Tim')" class="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-all text-[10px]">
+                        <span class="block font-bold text-emerald-400">Ketua Tim</span>
+                        <span class="text-[9px] text-slate-400">Tim Only</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer info -->
+            <p class="text-[9px] text-slate-500 font-medium text-center mt-6">
+                © 2026 Tim Umum & Humas BPS Provinsi Kalimantan Barat
+            </p>
+        </div>
+    </div>
+
     <!-- MAIN APP CONTAINER -->
     <div class="min-h-screen flex bg-slateBg w-full">
 
@@ -191,7 +332,7 @@
         <!-- LEFT SIDEBAR -->
         <aside id="sidebar" class="flex flex-col fixed left-0 top-0 bottom-0 z-50 bg-white border-r border-slate-100 sidebar-transition w-64 transform -translate-x-full">
             <!-- Sidebar Header -->
-            <div class="h-16 flex items-center px-6 border-b border-slate-50">
+            <div class="h-16 flex items-center justify-between px-6 border-b border-slate-50">
                 <div class="flex items-center gap-3 logo-container sidebar-transition">
                     <div class="w-8 h-8 rounded-xl bg-bpsBlue flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-bpsBlue/20">
                         <i class="fa-solid fa-chart-pie text-sm"></i>
@@ -229,8 +370,25 @@
                 </button>
             </nav>
 
+            <!-- User Session Box & Logout Button -->
+            <div class="p-4 border-t border-slate-100 bg-slate-50/80">
+                <div class="flex items-center gap-3 mb-3">
+                    <div id="user-role-badge-icon" class="w-9 h-9 rounded-full bg-bpsBlue text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div class="overflow-hidden flex-1">
+                        <h4 id="sidebar-user-name" class="text-xs font-bold text-slate-800 truncate">Pegawai</h4>
+                        <p id="sidebar-user-role" class="text-[10px] text-slate-400 font-semibold truncate">Role: -</p>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100 text-xs font-bold transition-all">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Keluar (Logout)</span>
+                </button>
+            </div>
+
             <!-- Sidebar Footer -->
-            <div class="p-6 border-t border-slate-50 text-[9px] text-slate-400 font-semibold tracking-wider space-y-1 logo-container sidebar-transition">
+            <div class="p-4 border-t border-slate-50 text-[9px] text-slate-400 font-semibold tracking-wider space-y-0.5">
                 <p>© 2026 Tim Umum & Humas</p>
                 <p>BPS Provinsi Kalimantan Barat</p>
             </div>
@@ -265,24 +423,49 @@
                     </div>
                 </div>
 
-                <!-- Live Clock, Refresh Controls, spreadsheet link -->
-                <div class="flex items-center gap-3.5 sm:gap-4">
-                    <button onclick="reloadData()" title="Refresh Data"
-                        class="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:text-bpsBlue hover:bg-blue-50 transition-all">
+                <!-- User Badge & Live Clock & Refresh Controls -->
+                <div class="flex items-center gap-3">
+                    <button onclick="reloadData(true)" title="Refresh Data"
+                        class="flex items-center justify-center w-8.5 h-8.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:text-bpsBlue hover:bg-blue-50 transition-all p-2">
                         <i class="fa-solid fa-arrows-rotate text-xs"></i>
                     </button>
+
                     <div class="text-right hidden sm:block">
                         <p id="live-time" class="text-xs font-bold text-slate-700">00:00:00</p>
                         <p id="live-date" class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Memuat...</p>
                     </div>
-                    <div class="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-bpsBlue font-bold text-sm border border-slate-100 shadow-sm">
-                        <i class="fa-solid fa-user-shield"></i>
+
+                    <!-- User Header Pill -->
+                    <div class="hidden md:flex items-center gap-2 bg-slate-50 border border-slate-200 pl-3 pr-2 py-1 rounded-xl">
+                        <div class="text-right">
+                            <p id="header-user-name" class="text-xs font-extrabold text-slate-800">Nama User</p>
+                            <p id="header-user-role" class="text-[9px] font-bold text-bpsBlue">Role</p>
+                        </div>
+                        <button onclick="handleLogout()" title="Logout" class="w-7 h-7 rounded-lg bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white flex items-center justify-center text-xs transition-all">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
                     </div>
                 </div>
             </header>
 
             <!-- MAIN CONTENT AREA -->
             <main class="p-4 md:p-6 lg:p-8 max-w-[1200px] w-full mx-auto flex-1">
+
+                <!-- Dynamic Role & Team Active Banner -->
+                <div id="role-team-banner" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-bpsBlue to-blue-700 text-white shadow-lg shadow-bpsBlue/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-xl text-amber-300">
+                            <i id="banner-role-icon" class="fa-solid fa-user-group"></i>
+                        </div>
+                        <div>
+                            <span id="banner-role-tag" class="text-[10px] font-extrabold tracking-widest uppercase bg-white/20 px-2 py-0.5 rounded-md text-amber-300">HAK AKSES TIM KERJA</span>
+                            <h2 id="banner-team-name" class="text-base font-extrabold tracking-tight mt-0.5">Dashboard Tim Kerja: -</h2>
+                        </div>
+                    </div>
+                    <div id="banner-access-desc" class="text-xs text-blue-100 font-medium sm:text-right">
+                        Menampilkan data terisolasi untuk anggota Tim Kerja Anda.
+                    </div>
+                </div>
 
                 <!-- ================= TAB A: DASHBOARD ================= -->
                 <div id="tab-dashboard" class="tab-content active">
@@ -386,7 +569,7 @@
                                     <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
                                         <div>
                                             <p class="text-xs font-bold text-slate-800">Auto Refresh</p>
-                                            <p class="text-[10px] text-slate-400">Interval pembaruan 10 detik</p>
+                                            <p class="text-[10px] text-slate-400">Interval pembaruan 30 detik</p>
                                         </div>
                                         <label class="relative inline-flex items-center cursor-pointer">
                                             <input type="checkbox" id="auto-refresh-toggle" checked class="sr-only peer">
@@ -433,7 +616,7 @@
                                         <option value="7">Juli</option>
                                         <option value="8">Agustus</option>
                                         <option value="9">September</option>
-                                        <option value="10">Oktober</option>
+                                        <option value="10" selected>Oktober</option>
                                         <option value="11">November</option>
                                         <option value="12">Desember</option>
                                     </select>
@@ -460,7 +643,7 @@
                         <div class="p-4 rounded-xl bg-blue-50/50 border border-blue-100 flex items-start gap-3">
                             <i class="fa-solid fa-circle-info text-bpsBlue mt-0.5 text-sm"></i>
                             <div class="text-xs text-slate-600 leading-relaxed">
-                                <span class="font-bold text-slate-700">Tentang Grafik:</span> Grafik di atas menampilkan dua data visual sekaligus: batang berwarna jingga (frekuensi harian pegawai yang keluar) dan kurva garis biru (jumlah kumulatif pegawai keluar) sepanjang hari-hari pada bulan yang bersangkutan. Grafik akan otomatis memperbarui tampilan saat filter bulan dan tahun diubah.
+                                <span class="font-bold text-slate-700">Tentang Grafik:</span> Grafik di atas menampilkan dua data visual sekaligus: batang berwarna jingga (frekuensi harian pegawai yang keluar) dan kurva garis biru (jumlah kumulatif pegawai keluar) sepanjang hari-hari pada bulan yang bersangkutan. Grafik diproses sesuai hak akses role pengguna yang sedang aktif.
                             </div>
                         </div>
                     </div>
@@ -503,7 +686,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="today-tbody" class="divide-y divide-slate-100 font-medium text-slate-700">
-                                    <!-- Table contents will be dynamically rendered -->
+                                    <!-- Table contents dynamically rendered -->
                                 </tbody>
                             </table>
                         </div>
@@ -643,15 +826,15 @@
                     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 lg:p-6 space-y-4">
                         <div class="border-b border-slate-100 pb-3.5">
                             <h1 class="text-base font-extrabold text-slate-900 tracking-tight">Menu Pengelolaan Sesi</h1>
-                            <p class="text-xs text-slate-400 font-medium">Panel khusus administrator untuk menyelesaikan atau membatalkan sesi keluar-masuk secara langsung.</p>
+                            <p class="text-xs text-slate-400 font-medium">Panel khusus untuk menyelesaikan atau membatalkan sesi keluar-masuk secara langsung.</p>
                         </div>
 
-                        <!-- Active Outings List for Admin -->
+                        <!-- Active Outings List for Admin / Supervisor / Ketua Tim -->
                         <div class="space-y-4">
                             <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl text-xs text-bpsBlue leading-relaxed flex items-start gap-2.5">
                                 <i class="fa-solid fa-circle-exclamation text-base mt-0.5"></i>
                                 <div>
-                                    <span class="font-bold">Tips Pengelolaan:</span> Jika pegawai lupa menekan tombol <b>Jam Kembali</b> pada aplikasi SIKEMAS, administrator dapat menekan tombol <b>Selesaikan Sesi</b> di bawah ini untuk menginputkan jam kembali secara manual. Gunakan tombol <b>Hapus</b> untuk menghapus riwayat dari database jika terjadi kesalahan entri.
+                                    <span class="font-bold">Tips Pengelolaan:</span> Jika pegawai lupa menekan tombol <b>Jam Kembali</b> pada aplikasi SIKEMAS, Anda dapat menekan tombol <b>Selesaikan</b> di bawah ini untuk menginputkan jam kembali. Gunakan tombol <b>Hapus</b> untuk membatalkan/menghapus baris sesi milik pegawai tersebut secara permanen.
                                 </div>
                             </div>
 
@@ -682,8 +865,12 @@
     <!-- Live clock script & API calls -->
     <script>
         // Endpoint URL fallback jika dijalankan lokal
-        // const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyv-BnYEzLO41NkhkG9kRxuZQ_AzgbF51hamfACEbokj4WTdWhicwPsR5wrJ2Xa3W4Z/exec";
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVVl2X7Xjt3SE8G1-xgpofjKCYEfG7eMuRWFlKAP_cKz7fN7AffUy6_LVdscT1DwcdYw/exec";
+
+        // Current Logged-in User Session
+        let currentUser = null; // { nama, timKerja, nip, role }
+        let allUsersList = []; // list of users from User sheet { nama, timKerja, nip, role }
+        let userTeamMap = {}; // mapping nama -> timKerja
 
         // Global dataset records
         let allRecords = [];
@@ -706,7 +893,7 @@
         let todayPage = 1;
         const todayPageSize = 10;
         let todaySortField = 'waktuKeluar';
-        let todaySortOrder = 'desc'; // 'asc' or 'desc'
+        let todaySortOrder = 'desc';
 
         // History pagination state
         let filteredRiwayatData = [];
@@ -755,8 +942,127 @@
         window.onload = function() {
             applySidebarState();
             startLiveClock();
+            checkSavedSession();
+        }
+
+        // Session Check on Startup
+        function checkSavedSession() {
+            try {
+                const saved = localStorage.getItem('sikemas_monitoring_user');
+                if (saved) {
+                    currentUser = JSON.parse(saved);
+                    showLoginScreen(false);
+                    initDashboardApp();
+                } else {
+                    showLoginScreen(true);
+                }
+            } catch (e) {
+                showLoginScreen(true);
+            }
+        }
+
+        function showLoginScreen(show) {
+            const loginScreen = document.getElementById('login-screen');
+            if (show) {
+                loginScreen.classList.remove('hidden');
+            } else {
+                loginScreen.classList.add('hidden');
+            }
+        }
+
+        // Quick Demo Credential Helper
+        function fillQuickDemo(role) {
+            const nipEl = document.getElementById('login-nip');
+            const pwdEl = document.getElementById('login-password');
+            const roleEl = document.getElementById('login-role');
+            const errBox = document.getElementById('login-error-box');
+            if (errBox) errBox.classList.add('hidden');
+
+            if (role === 'Admin') {
+                nipEl.value = '199501012020011001';
+                pwdEl.value = 'admin123';
+                roleEl.value = 'Admin';
+            } else if (role === 'Supervisor') {
+                nipEl.value = '199002022015021002';
+                pwdEl.value = 'supervisor123';
+                roleEl.value = 'Supervisor';
+            } else {
+                nipEl.value = '199203032018032003';
+                pwdEl.value = 'ketua123';
+                roleEl.value = 'Ketua Tim';
+            }
+        }
+
+        // Toggle Password Input Visibility
+        function togglePasswordVisibility() {
+            const pwdEl = document.getElementById('login-password');
+            const eyeIcon = document.getElementById('pwd-eye-icon');
+            if (pwdEl.type === 'password') {
+                pwdEl.type = 'text';
+                eyeIcon.className = 'fa-solid fa-eye-slash text-xs';
+            } else {
+                pwdEl.type = 'password';
+                eyeIcon.className = 'fa-solid fa-eye text-xs';
+            }
+        }
+
+        // Handle Login Submit
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const nip = document.getElementById('login-nip').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            const role = document.getElementById('login-role').value;
+            const errBox = document.getElementById('login-error-box');
+            const errMsg = document.getElementById('login-error-msg');
+            const submitBtn = document.getElementById('btn-login-submit');
+
+            if (!nip || !password || !role) {
+                errMsg.textContent = "NIP, Password, dan Role wajib diisi!";
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            errBox.classList.add('hidden');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Memverifikasi...</span>`;
+
+            try {
+                const res = await callAppsScript('loginUser', { nip: nip, password: password, role: role });
+                if (res && res.success && res.user) {
+                    currentUser = res.user;
+                    localStorage.setItem('sikemas_monitoring_user', JSON.stringify(currentUser));
+                    showLoginScreen(false);
+                    initDashboardApp();
+                } else {
+                    errMsg.textContent = (res && res.message) ? res.message : "NIP, Password, atau Role tidak sesuai!";
+                    errBox.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Login error:", err);
+                errMsg.textContent = "Gagal memproses login. Pastikan server terhubung: " + err.toString();
+                errBox.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span>Masuk ke Dashboard</span> <i class="fa-solid fa-arrow-right"></i>`;
+            }
+        }
+
+        // Handle Logout
+        function handleLogout() {
+            showCustomConfirm("Apakah Anda yakin ingin keluar dari sistem Monitoring SIKEMAS?", function() {
+                closeCustomConfirm();
+                localStorage.removeItem('sikemas_monitoring_user');
+                currentUser = null;
+                showLoginScreen(true);
+            });
+        }
+
+        // Initialize Main App after authentication
+        async function initDashboardApp() {
+            updateUserUIHeader();
+            loadUsersList();
             loadSheetUrl();
-            reloadData(true); // Load data initially
+            reloadData(true);
 
             // Setup Auto Refresh toggling
             const toggle = document.getElementById('auto-refresh-toggle');
@@ -769,6 +1075,55 @@
 
             // Start live refresh for durations in active outings table
             setInterval(updateLiveDurations, 60000); // refresh durations every 1 minute
+        }
+
+        // Update Header & Sidebar UI based on logged-in user & role
+        function updateUserUIHeader() {
+            if (!currentUser) return;
+
+            document.getElementById('sidebar-user-name').textContent = currentUser.nama;
+            document.getElementById('sidebar-user-role').textContent = `Role: ${currentUser.role}`;
+
+            document.getElementById('header-user-name').textContent = currentUser.nama;
+            document.getElementById('header-user-role').textContent = `${currentUser.role} (${currentUser.timKerja})`;
+
+            const bannerTag = document.getElementById('banner-role-tag');
+            const bannerName = document.getElementById('banner-team-name');
+            const bannerDesc = document.getElementById('banner-access-desc');
+            const bannerIcon = document.getElementById('banner-role-icon');
+
+            if (currentUser.role === 'Ketua Tim') {
+                bannerTag.textContent = `HAK AKSES KETUA TIM`;
+                bannerName.textContent = `Dashboard Tim Kerja: ${currentUser.timKerja}`;
+                bannerDesc.textContent = `Hanya menampilkan data pegawai pada ${currentUser.timKerja}.`;
+                bannerIcon.className = "fa-solid fa-users-gear text-amber-300";
+            } else if (currentUser.role === 'Supervisor') {
+                bannerTag.textContent = `HAK AKSES SUPERVISOR (FULL)`;
+                bannerName.textContent = `Dashboard Monitoring SIKEMAS - Semua Tim`;
+                bannerDesc.textContent = `Hak Akses Penuh: Menampilkan seluruh data pegawai BPS Kalbar.`;
+                bannerIcon.className = "fa-solid fa-user-shield text-amber-300";
+            } else {
+                bannerTag.textContent = `HAK AKSES ADMINISTRATOR (FULL)`;
+                bannerName.textContent = `Dashboard Monitoring SIKEMAS - Administrator`;
+                bannerDesc.textContent = `Hak Akses Penuh Pengelolaan Sesi & Data Pegawai.`;
+                bannerIcon.className = "fa-solid fa-sliders text-amber-300";
+            }
+        }
+
+        // Load users list mapping
+        async function loadUsersList() {
+            try {
+                const res = await callAppsScript('getEmployeeNames');
+                if (res && res.success && res.data) {
+                    allUsersList = res.data;
+                    userTeamMap = {};
+                    allUsersList.forEach(u => {
+                        userTeamMap[u.nama.toLowerCase()] = u.timKerja;
+                    });
+                }
+            } catch(e) {
+                console.error("Gagal memuat data pengguna:", e);
+            }
         }
 
         // Clock & Date Logic
@@ -838,6 +1193,27 @@
             }
         }
 
+        // Filter records according to logged in user role (Ketua Tim vs Supervisor/Admin)
+        function getFilteredRoleRecords() {
+            if (!currentUser) return allRecords;
+            if (currentUser.role === 'Supervisor' || currentUser.role === 'Admin') {
+                return allRecords; // Hak akses penuh seluruh tim
+            }
+
+            // Role: Ketua Tim - hanya tampilkan anggota Tim Kerja bersangkutan
+            const userTeam = currentUser.timKerja.toLowerCase().trim();
+            return allRecords.filter(r => {
+                const empName = r.nama.toLowerCase().trim();
+                const mappedTeam = userTeamMap[empName];
+                if (mappedTeam) {
+                    return mappedTeam.toLowerCase().trim() === userTeam;
+                }
+                // Fallback jika pegawai sama dengan user
+                if (empName === currentUser.nama.toLowerCase().trim()) return true;
+                return true; // Tampilkan jika tidak terpetakan khusus
+            });
+        }
+
         // Auto Refresh Toggle Logic
         function toggleAutoRefresh(enable) {
             if (autoRefreshInterval) {
@@ -853,7 +1229,6 @@
 
         // Live refresh durations
         function updateLiveDurations() {
-            // Update active outings table live duration badges
             const rows = document.querySelectorAll('.live-duration-badge');
             rows.forEach(badge => {
                 const waktuKeluar = badge.getAttribute('data-keluar');
@@ -875,11 +1250,11 @@
 
         // ================= DASHBOARD LOGIC (A) =================
         function processDashboardData() {
-            // Get today date in DD-MM-YYYY format
             const todayStr = getTodayDateString();
+            const records = getFilteredRoleRecords();
             
             // Filter records for today
-            const todayRecords = allRecords.filter(r => r.tanggal === todayStr);
+            const todayRecords = records.filter(r => r.tanggal === todayStr);
 
             // Stats
             const totalTerdaftar = todayRecords.length;
@@ -926,22 +1301,20 @@
         function renderChartData() {
             const bulan = parseInt(document.getElementById('filter-chart-bulan').value, 10);
             const tahun = parseInt(document.getElementById('filter-chart-tahun').value, 10);
+            const records = getFilteredRoleRecords();
 
-            // Days in selected month
             const daysInMonth = new Date(tahun, bulan, 0).getDate();
             const labels = [];
             const dailyCounts = [];
             const cumulativeCounts = [];
 
-            // Initialize counts
             for (let d = 1; d <= daysInMonth; d++) {
                 labels.push(`H-${d.toString().padStart(2, '0')}`);
                 dailyCounts.push(0);
                 cumulativeCounts.push(0);
             }
 
-            // Populate daily exit counts
-            allRecords.forEach(rec => {
+            records.forEach(rec => {
                 if (!rec.tanggal || rec.waktuKeluar === "-") return;
                 
                 const parts = rec.tanggal.split('-'); // DD-MM-YYYY
@@ -958,14 +1331,12 @@
                 }
             });
 
-            // Calculate cumulative counts
             let sum = 0;
             for (let i = 0; i < daysInMonth; i++) {
                 sum += dailyCounts[i];
                 cumulativeCounts[i] = sum;
             }
 
-            // Render Chart.js Canvas
             const ctx = document.getElementById('outingsChart').getContext('2d');
             
             if (outingsChartInstance) {
@@ -1025,7 +1396,7 @@
                                 font: { weight: 'bold', size: 10 }
                             },
                             ticks: { precision: 0 },
-                            grid: { drawOnChartArea: false } // prevent duplicate gridlines
+                            grid: { drawOnChartArea: false }
                         },
                         x: {
                             grid: { display: false }
@@ -1047,26 +1418,25 @@
         function filterTodayData() {
             const todayStr = getTodayDateString();
             const query = document.getElementById('search-today').value.toLowerCase().trim();
+            const records = getFilteredRoleRecords();
 
-            let data = allRecords.filter(r => r.tanggal === todayStr);
+            let data = records.filter(r => r.tanggal === todayStr);
 
             if (query) {
                 data = data.filter(r => r.nama.toLowerCase().includes(query));
             }
 
             todayData = data;
-            todayPage = 1; // Reset to page 1 on search
+            todayPage = 1;
             sortAndRenderTodayTable();
         }
 
         function sortAndRenderTodayTable() {
-            // Apply sorting
             todayData.sort((a, b) => {
                 let valA = a[todaySortField] || "";
                 let valB = b[todaySortField] || "";
 
                 if (todaySortField === 'waktuKeluar' || todaySortField === 'waktuKembali') {
-                    // Normalize missing values for sorting
                     if (valA === "-") valA = todaySortOrder === 'asc' ? "99:99" : "00:00";
                     if (valB === "-") valB = todaySortOrder === 'asc' ? "99:99" : "00:00";
                 }
@@ -1080,7 +1450,6 @@
                 }
             });
 
-            // Update Sort Icons
             const fields = ['nama', 'waktuKeluar', 'waktuKembali'];
             fields.forEach(f => {
                 const icon = document.getElementById(`sort-icon-today-${f}`);
@@ -1105,7 +1474,6 @@
             const total = todayData.length;
             const totalPages = Math.ceil(total / todayPageSize);
 
-            // Handle empty state
             if (total === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Tidak ada data detail pegawai keluar hari ini.</td></tr>`;
                 document.getElementById('today-page-info').textContent = "Menampilkan 0 - 0 dari 0 data";
@@ -1114,7 +1482,6 @@
                 return;
             }
 
-            // Keep page in bound
             if (todayPage > totalPages) todayPage = totalPages;
             if (todayPage < 1) todayPage = 1;
 
@@ -1150,7 +1517,6 @@
                 tbody.appendChild(tr);
             });
 
-            // Update page controls
             document.getElementById('today-page-info').textContent = `Menampilkan ${startIdx + 1} - ${endIdx} dari ${total} data`;
             document.getElementById('btn-today-prev').disabled = todayPage === 1;
             document.getElementById('btn-today-next').disabled = todayPage === totalPages || totalPages === 0;
@@ -1166,7 +1532,6 @@
             sortAndRenderTodayTable();
         }
 
-        // Navigation controls
         function prevTodayPage() {
             if (todayPage > 1) {
                 todayPage--;
@@ -1185,21 +1550,18 @@
         // ================= RIWAYAT LOGIC (D) =================
         function applyFiltersRiwayat() {
             const queryName = document.getElementById('filter-riwayat-nama').value.toLowerCase().trim();
-            const filterDate = document.getElementById('filter-riwayat-tanggal').value; // YYYY-MM-DD
+            const filterDate = document.getElementById('filter-riwayat-tanggal').value;
             const filterMonth = document.getElementById('filter-riwayat-bulan').value;
             const filterYear = document.getElementById('filter-riwayat-tahun').value;
             const filterStatus = document.getElementById('filter-riwayat-status').value;
 
-            let data = [...allRecords];
+            let data = getFilteredRoleRecords();
 
-            // Filter by Name
             if (queryName) {
                 data = data.filter(r => r.nama.toLowerCase().includes(queryName));
             }
 
-            // Filter by Specific Date
             if (filterDate) {
-                // Convert input date from YYYY-MM-DD to DD-MM-YYYY
                 const dateParts = filterDate.split('-');
                 if (dateParts.length === 3) {
                     const formatInputDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
@@ -1207,7 +1569,6 @@
                 }
             }
 
-            // Filter by Month
             if (filterMonth) {
                 data = data.filter(r => {
                     if (!r.tanggal) return false;
@@ -1216,7 +1577,6 @@
                 });
             }
 
-            // Filter by Year
             if (filterYear) {
                 data = data.filter(r => {
                     if (!r.tanggal) return false;
@@ -1225,7 +1585,6 @@
                 });
             }
 
-            // Filter by Status
             if (filterStatus) {
                 if (filterStatus === 'Sedang Keluar') {
                     data = data.filter(r => r.waktuKeluar !== "-" && r.waktuKembali === "-");
@@ -1240,13 +1599,11 @@
         }
 
         function sortAndRenderRiwayatTable() {
-            // Apply sorting
             filteredRiwayatData.sort((a, b) => {
                 let valA = a[riwayatSortField] || "";
                 let valB = b[riwayatSortField] || "";
 
                 if (riwayatSortField === 'tanggal') {
-                    // Sort by parsed date
                     const parseDate = (dStr) => {
                         if (!dStr) return 0;
                         const p = dStr.split('-');
@@ -1272,7 +1629,6 @@
                 }
             });
 
-            // Update sort icons
             const fields = ['nama', 'tanggal', 'waktuKeluar', 'waktuKembali'];
             fields.forEach(f => {
                 const icon = document.getElementById(`sort-icon-riwayat-${f}`);
@@ -1297,7 +1653,6 @@
             const total = filteredRiwayatData.length;
             const totalPages = Math.ceil(total / riwayatPageSize);
 
-            // Empty state
             if (total === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Tidak ada riwayat aktivitas keluar masuk pegawai.</td></tr>`;
                 document.getElementById('riwayat-page-info').textContent = "Menampilkan 0 - 0 dari 0 data";
@@ -1306,7 +1661,6 @@
                 return;
             }
 
-            // Keep in bounds
             if (riwayatPage > totalPages) riwayatPage = totalPages;
             if (riwayatPage < 1) riwayatPage = 1;
 
@@ -1351,7 +1705,6 @@
                 tbody.appendChild(tr);
             });
 
-            // Update page controls
             document.getElementById('riwayat-page-info').textContent = `Menampilkan ${startIdx + 1} - ${endIdx} dari ${total} data`;
             document.getElementById('btn-riwayat-prev').disabled = riwayatPage === 1;
             document.getElementById('btn-riwayat-next').disabled = riwayatPage === totalPages || totalPages === 0;
@@ -1387,8 +1740,8 @@
             const tbody = document.getElementById('manage-tbody');
             tbody.innerHTML = '';
 
-            // Filter out active sessions (Went out, hasn't returned yet)
-            const activeSessions = allRecords.filter(r => r.waktuKeluar !== "-" && r.waktuKembali === "-");
+            const records = getFilteredRoleRecords();
+            const activeSessions = records.filter(r => r.waktuKeluar !== "-" && r.waktuKembali === "-");
 
             if (activeSessions.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Tidak ada sesi aktif yang memerlukan pengelolaan saat ini.</td></tr>`;
@@ -1409,7 +1762,8 @@
                             <i class="fa-solid fa-clock-rotate-left mr-1"></i> Selesaikan
                         </button>
                         <button onclick="confirmDeleteRecord('${item.sessionId}', '${item.nama}')" 
-                            class="bg-rose-50 border border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white py-1.5 px-3 rounded-lg text-[10px] transition-all">
+                            class="bg-rose-50 border border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white py-1.5 px-3 rounded-lg text-[10px] transition-all"
+                            title="Reset / Batal Sesi Pegawai">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>
@@ -1427,7 +1781,6 @@
             document.getElementById('fc-nama').value = name;
             document.getElementById('fc-keluar').value = outTime;
             
-            // Default Jam Kembali to current HH:MM
             const now = new Date();
             const h = now.getHours().toString().padStart(2, '0');
             const m = now.getMinutes().toString().padStart(2, '0');
@@ -1459,7 +1812,7 @@
                 showLoader(false);
                 if (res && res.success) {
                     showCustomAlert("Berhasil", res.message || "Sesi berhasil diselesaikan.", "success");
-                    reloadData(true); // reload tables and stats
+                    reloadData(true);
                 } else {
                     showCustomAlert("Gagal", res.message || "Gagal menyelesaikan sesi.", "error");
                 }
@@ -1469,10 +1822,10 @@
             }
         }
 
-        // Delete active outing manual
+        // Delete / Reset active outing specifically for that employee
         function confirmDeleteRecord(sessionId, name) {
             showCustomConfirm(
-                `Apakah Anda yakin ingin menghapus data keluar masuk pegawai <b>${name}</b> secara permanen dari database?`,
+                `Apakah Anda yakin ingin melakukan <b>Reset Sesi</b> dan menghapus baris sesi milik pegawai <b>${name}</b> dari database SIKEMAS?`,
                 async function() {
                     closeCustomConfirm();
                     showLoader(true);
@@ -1484,7 +1837,7 @@
                         
                         showLoader(false);
                         if (res && res.success) {
-                            showCustomAlert("Berhasil Dihapus", res.message || "Data berhasil dihapus.", "success");
+                            showCustomAlert("Reset Sesi Berhasil", res.message || "Baris sesi berhasil dihapus secara permanen.", "success");
                             reloadData(true);
                         } else {
                             showCustomAlert("Gagal", res.message || "Gagal menghapus data dari database.", "error");
@@ -1504,7 +1857,6 @@
                 return;
             }
 
-            // Map data to readable excel rows
             const excelRows = filteredRiwayatData.map((item, idx) => ({
                 "NO": idx + 1,
                 "NAMA PEGAWAI": item.nama,
@@ -1517,51 +1869,42 @@
                 "STATUS": item.waktuKembali !== "-" ? "Selesai" : (item.waktuKeluar !== "-" ? "Sedang Keluar" : "Menunggu Keluar")
             }));
 
-            // Create SheetJS Worksheet
             const worksheet = XLSX.utils.json_to_sheet(excelRows);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Riwayat Log SIKEMAS");
 
-            // Format column widths beautifully
             const maxW = [5, 25, 10, 15, 12, 12, 20, 35, 15];
             worksheet['!cols'] = maxW.map(w => ({ wch: w }));
 
-            // Trigger Download
             const dateStr = getTodayDateString();
             XLSX.writeFile(workbook, `SIKEMAS_Riwayat_Log_${dateStr}.xlsx`);
         }
 
         // ================= UI HELPERS =================
         function switchTab(tabId, btn) {
-            // Hide all contents
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(el => el.classList.remove('active'));
 
-            // Show active tab
             const activeTab = document.getElementById('tab-' + tabId);
             if (activeTab) activeTab.classList.add('active');
 
-            // Un-highlight all nav buttons
             const navButtons = document.querySelectorAll('.sidebar-nav-item');
             navButtons.forEach(el => {
                 el.classList.remove('text-bpsBlue', 'bg-blue-50/50');
                 el.classList.add('text-slate-400', 'hover:text-slate-700', 'hover:bg-slate-50/50');
             });
 
-            // Highlight active nav button
             if (btn) {
                 btn.classList.remove('text-slate-400', 'hover:text-slate-700', 'hover:bg-slate-50/50');
                 btn.classList.add('text-bpsBlue', 'bg-blue-50/50');
             }
 
-            // Close sidebar on mobile after selecting a menu item
             if (window.innerWidth < 1024) {
                 sidebarOpen = false;
                 applySidebarState();
             }
         }
 
-        // Apply sidebar state based on resolution & sidebarOpen status
         function applySidebarState() {
             const sidebar = document.getElementById('sidebar');
             const mainWrapper = document.getElementById('main-wrapper');
@@ -1570,7 +1913,6 @@
             const isMobile = window.innerWidth < 1024;
 
             if (isMobile) {
-                // Mobile layout - sidebar acts as overlay/off-canvas
                 mainWrapper.classList.remove('lg:pl-64', 'lg:pl-0', 'lg:pl-20');
                 mainWrapper.classList.add('pl-0');
 
@@ -1578,7 +1920,6 @@
                     sidebar.classList.remove('-translate-x-full');
                     sidebar.classList.add('translate-x-0', 'shadow-2xl');
                     
-                    // Show backdrop overlay
                     overlay.classList.remove('hidden');
                     setTimeout(() => {
                         overlay.classList.add('opacity-100');
@@ -1589,7 +1930,6 @@
                     sidebar.classList.remove('translate-x-0', 'shadow-2xl');
                     sidebar.classList.add('-translate-x-full');
                     
-                    // Hide backdrop overlay
                     overlay.classList.remove('opacity-100');
                     setTimeout(() => {
                         if (!sidebarOpen) {
@@ -1600,12 +1940,10 @@
                     if (toggleBtnIcon) toggleBtnIcon.className = 'fa-solid fa-bars text-lg';
                 }
             } else {
-                // Desktop/Laptop layout - sidebar collapses/expands and pushes content
                 overlay.classList.add('hidden');
                 overlay.classList.remove('opacity-100');
                 sidebar.classList.remove('shadow-2xl');
                 
-                // Clean up mobile padding
                 mainWrapper.classList.remove('pl-0');
 
                 if (sidebarOpen) {
@@ -1624,13 +1962,11 @@
             }
         }
 
-        // Toggle Sidebar state
         function toggleSidebar() {
             sidebarOpen = !sidebarOpen;
             applySidebarState();
         }
 
-        // Handle window resizing to keep layout consistent
         let lastWidth = window.innerWidth;
         window.addEventListener('resize', function() {
             if (window.innerWidth !== lastWidth) {
@@ -1639,14 +1975,12 @@
                 lastWidth = window.innerWidth;
 
                 if (wasMobile !== isMobile) {
-                    // Reset open state based on breakpoint transition
                     sidebarOpen = !isMobile;
                 }
                 applySidebarState();
             }
         });
 
-        // Custom Confirm Dialog Callers
         function showCustomConfirm(message, callback) {
             document.getElementById('confirm-message').innerHTML = message;
             activeConfirmCallback = callback;
@@ -1662,7 +1996,6 @@
             activeConfirmCallback = null;
         }
 
-        // Custom Alert Dialog Callers
         function showCustomAlert(title, message, type = "info") {
             const modal = document.getElementById('custom-alert');
             const titleEl = document.getElementById('modal-title');
@@ -1670,7 +2003,7 @@
             const iconEl = document.getElementById('modal-icon');
 
             titleEl.textContent = title;
-            msgEl.innerHTML = message; // Support bold text in confirmation
+            msgEl.innerHTML = message;
 
             iconEl.className = "w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl";
             
@@ -1704,7 +2037,6 @@
             return `${d}-${m}-${y}`;
         }
 
-        // Calculate live outing duration
         function calculateLiveDurationText(waktuKeluar) {
             if (!waktuKeluar || waktuKeluar === "-") return "-";
             try {
@@ -1718,7 +2050,7 @@
                     const endM = now.getMinutes();
                     
                     let diff = (endH * 60 + endM) - (startH * 60 + startM);
-                    if (diff < 0) diff += 24 * 60; // middle of the night correction
+                    if (diff < 0) diff += 24 * 60;
                     
                     const h = Math.floor(diff / 60);
                     const m = diff % 60;
