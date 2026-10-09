@@ -96,32 +96,14 @@
             background: #94a3b8;
         }
 
-        /* Animated Logo & Login Elements */
-        @keyframes floatBg {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-12px) rotate(3deg); }
-        }
-
+        /* Subtle glowing background accent */
         @keyframes pulseGlow {
-            0%, 100% { opacity: 0.4; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.08); }
-        }
-
-        @keyframes rotateRing {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .login-bg-float {
-            animation: floatBg 6s ease-in-out infinite;
+            0%, 100% { opacity: 0.35; transform: scale(1); }
+            50% { opacity: 0.65; transform: scale(1.05); }
         }
 
         .login-pulse-glow {
-            animation: pulseGlow 3s ease-in-out infinite;
-        }
-
-        .login-rotate-ring {
-            animation: rotateRing 12s linear infinite;
+            animation: pulseGlow 4s ease-in-out infinite;
         }
     </style>
 </head>
@@ -212,37 +194,56 @@
 
     <!-- ================= LOGIN OVERLAY SCREEN ================= -->
     <div id="login-screen" class="fixed inset-0 z-[10000] bg-slate-950 flex items-center justify-center p-4 overflow-y-auto">
-        <!-- Background Glowing Circles -->
+        <!-- Background Glowing Accent -->
         <div class="absolute w-[500px] h-[500px] bg-bpsBlue/20 rounded-full blur-[120px] top-[-100px] left-[-100px] pointer-events-none login-pulse-glow"></div>
-        <div class="absolute w-[400px] h-[400px] bg-bpsOrange/20 rounded-full blur-[100px] bottom-[-50px] right-[-50px] pointer-events-none login-pulse-glow" style="animation-delay: 1.5s;"></div>
+        <div class="absolute w-[400px] h-[400px] bg-bpsOrange/15 rounded-full blur-[100px] bottom-[-50px] right-[-50px] pointer-events-none login-pulse-glow" style="animation-delay: 2s;"></div>
 
-        <div class="relative w-full max-w-md bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-100 login-bg-float">
-            <!-- SIKEMAS Animated Logo Header -->
+        <!-- Static Form Card (Tidak bergerak-gerak) -->
+        <div class="relative w-full max-w-md bg-slate-900/95 backdrop-blur-xl border border-slate-800/90 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-100">
+            
+            <!-- SIKEMAS Official Logo Icon -->
             <div class="flex flex-col items-center text-center mb-6">
-                <div class="relative w-24 h-24 mb-4 flex items-center justify-center">
-                    <!-- Rotating Decorative Ring -->
-                    <div class="absolute inset-0 rounded-full border-2 border-dashed border-bpsOrange/60 login-rotate-ring"></div>
-                    <!-- Outer Glowing Ring -->
-                    <div class="absolute inset-1 rounded-full bg-gradient-to-tr from-bpsBlue to-bpsOrange opacity-80 blur-sm login-pulse-glow"></div>
-                    <!-- Logo Circle Container -->
-                    <div class="relative w-20 h-20 rounded-full bg-slate-900 border border-slate-700 flex flex-col items-center justify-center shadow-inner">
-                        <i class="fa-solid fa-building-user text-2xl text-bpsOrange mb-0.5"></i>
-                        <span class="text-[9px] font-black text-white tracking-widest uppercase">SIKEMAS</span>
-                    </div>
+                <div class="relative mb-3 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-24 h-24 shadow-xl rounded-[24px]">
+                        <defs>
+                            <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#0066c0"/>
+                                <stop offset="100%" stop-color="#004685"/>
+                            </linearGradient>
+                            <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#f5a623"/>
+                                <stop offset="100%" stop-color="#e08200"/>
+                            </linearGradient>
+                            <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+                                <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#002244" flood-opacity="0.35"/>
+                            </filter>
+                        </defs>
+                        <rect width="512" height="512" rx="108" fill="url(#bgGrad)"/>
+                        <circle cx="430" cy="80" r="140" fill="#ffffff" opacity="0.04"/>
+                        <circle cx="80" cy="450" r="100" fill="#f29400" opacity="0.08"/>
+                        <g filter="url(#shadow)" transform="translate(20, -10)">
+                            <path d="M120 100 L230 100 A12 12 0 0 1 242 112 L242 360 A12 12 0 0 1 230 372 L120 372 A12 12 0 0 1 108 360 L108 112 A12 12 0 0 1 120 100 Z" fill="#003768" opacity="0.45"/>
+                            <path d="M112 104 L224 104 L224 368 L112 368 Z" fill="none" stroke="#60a5fa" stroke-width="8" stroke-dasharray="16 12" opacity="0.5"/>
+                            <circle cx="260" cy="150" r="32" fill="#ffffff"/>
+                            <path d="M250 195 C235 195 220 205 215 222 L190 285 C186 295 192 305 202 309 C212 312 222 306 226 296 L242 254 L258 290 L230 380 C226 392 234 404 246 406 C258 408 268 400 270 388 L294 314 L326 360 C334 370 348 372 358 364 C368 356 370 342 362 332 L324 278 L314 235 C310 216 296 202 278 197 C270 195 260 195 250 195 Z" fill="#ffffff"/>
+                            <path d="M280 226 L340 262 C348 266 358 264 364 256 C370 248 368 238 360 232 L310 204 Z" fill="#ffffff" opacity="0.9"/>
+                            <g transform="translate(320, 200)">
+                                <path d="M0 25 L85 25 L85 0 L140 45 L85 90 L85 65 L0 65 Z" fill="url(#orangeGrad)"/>
+                            </g>
+                        </g>
+                        <text x="256" y="445" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-weight="800" font-size="52" fill="#ffffff" text-anchor="middle" letter-spacing="6">SIKEMAS</text>
+                        <text x="256" y="475" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-weight="600" font-size="19" fill="#93c5fd" text-anchor="middle" letter-spacing="2">BPS KALBAR</text>
+                    </svg>
                 </div>
-                <h2 class="text-xl font-extrabold tracking-tight text-white">Monitoring SIKEMAS</h2>
-                <p class="text-xs text-slate-400 mt-1 font-medium">BPS Provinsi Kalimantan Barat</p>
-                <div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-semibold">
-                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping"></span>
-                    Portal Autentikasi Pengguna
-                </div>
+                <h2 class="text-xl font-extrabold tracking-tight text-white mt-1">Monitoring SIKEMAS</h2>
+                <p class="text-xs text-slate-400 mt-0.5 font-medium">BPS Provinsi Kalimantan Barat</p>
             </div>
 
-            <!-- Login Form -->
+            <!-- Login Form (NIP & Password Saja) -->
             <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
                 <!-- NIP Field (Kolom C) -->
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">NIP (Kolom C)</label>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">NIP</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                             <i class="fa-solid fa-id-card text-xs"></i>
@@ -254,7 +255,7 @@
 
                 <!-- Password Field (Kolom D) -->
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Password (Kolom D)</label>
+                    <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Password</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                             <i class="fa-solid fa-lock text-xs"></i>
@@ -267,57 +268,22 @@
                     </div>
                 </div>
 
-                <!-- Role Field (Kolom E) -->
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1.5">Role Hak Akses (Kolom E)</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                            <i class="fa-solid fa-user-shield text-xs"></i>
-                        </div>
-                        <select id="login-role" required
-                            class="w-full pl-10 pr-4 py-3 bg-slate-950/70 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-bpsBlue focus:ring-1 focus:ring-bpsBlue transition-all cursor-pointer font-semibold">
-                            <option value="Ketua Tim" class="bg-slate-900 text-white">Ketua Tim (Hak Akses Tim Kerja)</option>
-                            <option value="Supervisor" class="bg-slate-900 text-white">Supervisor (Hak Akses Penuh)</option>
-                            <option value="Admin" class="bg-slate-900 text-white">Admin (Hak Akses Penuh)</option>
-                        </select>
-                    </div>
-                </div>
-
                 <!-- Login Error Alert Box -->
                 <div id="login-error-box" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs leading-relaxed flex items-center gap-2">
                     <i class="fa-solid fa-circle-exclamation text-sm flex-shrink-0"></i>
-                    <span id="login-error-msg">NIP, Password, atau Role tidak valid.</span>
+                    <span id="login-error-msg">NIP atau Password tidak sesuai.</span>
                 </div>
 
                 <!-- Submit Button -->
                 <button type="submit" id="btn-login-submit"
-                    class="w-full bg-gradient-to-r from-bpsBlue to-blue-600 hover:from-blue-600 hover:to-bpsBlue text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg shadow-bpsBlue/30 hover:shadow-bpsBlue/50 active:scale-[0.98] transition-all text-xs flex items-center justify-center gap-2 mt-2">
+                    class="w-full bg-gradient-to-r from-bpsBlue to-blue-600 hover:from-blue-600 hover:to-bpsBlue text-white font-extrabold py-3.5 px-4 rounded-xl shadow-lg shadow-bpsBlue/30 hover:shadow-bpsBlue/50 active:scale-[0.98] transition-all text-xs flex items-center justify-center gap-2 mt-4">
                     <span>Masuk ke Dashboard</span>
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </form>
 
-            <!-- Quick Demo Helper -->
-            <div class="mt-6 pt-5 border-t border-slate-800/80">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">Petunjuk Pengujian Cepat Akun Demo</p>
-                <div class="grid grid-cols-3 gap-2 text-center">
-                    <button type="button" onclick="fillQuickDemo('Admin')" class="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-all text-[10px]">
-                        <span class="block font-bold text-amber-400">Admin</span>
-                        <span class="text-[9px] text-slate-400">All Access</span>
-                    </button>
-                    <button type="button" onclick="fillQuickDemo('Supervisor')" class="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-all text-[10px]">
-                        <span class="block font-bold text-blue-400">Supervisor</span>
-                        <span class="text-[9px] text-slate-400">All Access</span>
-                    </button>
-                    <button type="button" onclick="fillQuickDemo('Ketua Tim')" class="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-all text-[10px]">
-                        <span class="block font-bold text-emerald-400">Ketua Tim</span>
-                        <span class="text-[9px] text-slate-400">Tim Only</span>
-                    </button>
-                </div>
-            </div>
-
             <!-- Footer info -->
-            <p class="text-[9px] text-slate-500 font-medium text-center mt-6">
+            <p class="text-[9px] text-slate-500 font-medium text-center mt-6 pt-4 border-t border-slate-800/60">
                 © 2026 Tim Umum & Humas BPS Provinsi Kalimantan Barat
             </p>
         </div>
@@ -970,29 +936,6 @@
             }
         }
 
-        // Quick Demo Credential Helper
-        function fillQuickDemo(role) {
-            const nipEl = document.getElementById('login-nip');
-            const pwdEl = document.getElementById('login-password');
-            const roleEl = document.getElementById('login-role');
-            const errBox = document.getElementById('login-error-box');
-            if (errBox) errBox.classList.add('hidden');
-
-            if (role === 'Admin') {
-                nipEl.value = '199501012020011001';
-                pwdEl.value = 'admin123';
-                roleEl.value = 'Admin';
-            } else if (role === 'Supervisor') {
-                nipEl.value = '199002022015021002';
-                pwdEl.value = 'supervisor123';
-                roleEl.value = 'Supervisor';
-            } else {
-                nipEl.value = '199203032018032003';
-                pwdEl.value = 'ketua123';
-                roleEl.value = 'Ketua Tim';
-            }
-        }
-
         // Toggle Password Input Visibility
         function togglePasswordVisibility() {
             const pwdEl = document.getElementById('login-password');
@@ -1006,18 +949,17 @@
             }
         }
 
-        // Handle Login Submit
+        // Handle Login Submit (NIP & Password)
         async function handleLoginSubmit(e) {
             e.preventDefault();
             const nip = document.getElementById('login-nip').value.trim();
             const password = document.getElementById('login-password').value.trim();
-            const role = document.getElementById('login-role').value;
             const errBox = document.getElementById('login-error-box');
             const errMsg = document.getElementById('login-error-msg');
             const submitBtn = document.getElementById('btn-login-submit');
 
-            if (!nip || !password || !role) {
-                errMsg.textContent = "NIP, Password, dan Role wajib diisi!";
+            if (!nip || !password) {
+                errMsg.textContent = "NIP dan Password wajib diisi!";
                 errBox.classList.remove('hidden');
                 return;
             }
@@ -1027,14 +969,14 @@
             submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Memverifikasi...</span>`;
 
             try {
-                const res = await callAppsScript('loginUser', { nip: nip, password: password, role: role });
+                const res = await callAppsScript('loginUser', { nip: nip, password: password });
                 if (res && res.success && res.user) {
                     currentUser = res.user;
                     localStorage.setItem('sikemas_monitoring_user', JSON.stringify(currentUser));
                     showLoginScreen(false);
                     initDashboardApp();
                 } else {
-                    errMsg.textContent = (res && res.message) ? res.message : "NIP, Password, atau Role tidak sesuai!";
+                    errMsg.textContent = (res && res.message) ? res.message : "NIP atau Password tidak sesuai!";
                     errBox.classList.remove('hidden');
                 }
             } catch (err) {
@@ -1200,7 +1142,6 @@
                 return allRecords; // Hak akses penuh seluruh tim
             }
 
-            // Role: Ketua Tim - hanya tampilkan anggota Tim Kerja bersangkutan
             const userTeam = currentUser.timKerja.toLowerCase().trim();
             return allRecords.filter(r => {
                 const empName = r.nama.toLowerCase().trim();
@@ -1208,9 +1149,8 @@
                 if (mappedTeam) {
                     return mappedTeam.toLowerCase().trim() === userTeam;
                 }
-                // Fallback jika pegawai sama dengan user
                 if (empName === currentUser.nama.toLowerCase().trim()) return true;
-                return true; // Tampilkan jika tidak terpetakan khusus
+                return true;
             });
         }
 
@@ -1222,8 +1162,8 @@
             }
             if (enable) {
                 autoRefreshInterval = setInterval(function() {
-                    reloadData(false); // reload silently
-                }, 30000); // 30 seconds
+                    reloadData(false);
+                }, 30000);
             }
         }
 
@@ -1253,10 +1193,8 @@
             const todayStr = getTodayDateString();
             const records = getFilteredRoleRecords();
             
-            // Filter records for today
             const todayRecords = records.filter(r => r.tanggal === todayStr);
 
-            // Stats
             const totalTerdaftar = todayRecords.length;
             const sedangKeluar = todayRecords.filter(r => r.waktuKeluar !== "-" && r.waktuKembali === "-").length;
             const sudahKembali = todayRecords.filter(r => r.waktuKeluar !== "-" && r.waktuKembali !== "-").length;
@@ -1267,7 +1205,6 @@
             document.getElementById('stat-kembali').textContent = sudahKembali;
             document.getElementById('stat-menunggu').textContent = menungguKeluar;
 
-            // Fill active outings list table
             const tbody = document.getElementById('active-outings-tbody');
             tbody.innerHTML = '';
 
@@ -1317,7 +1254,7 @@
             records.forEach(rec => {
                 if (!rec.tanggal || rec.waktuKeluar === "-") return;
                 
-                const parts = rec.tanggal.split('-'); // DD-MM-YYYY
+                const parts = rec.tanggal.split('-');
                 if (parts.length === 3) {
                     const d = parseInt(parts[0], 10);
                     const m = parseInt(parts[1], 10);

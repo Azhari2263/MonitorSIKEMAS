@@ -113,16 +113,16 @@ function getEmployeeNames() {
 }
 
 /**
- * Autentikasi Login Pengguna berdasarkan NIP (Kolom C), Password (Kolom D), dan Role (Kolom E)
+ * Autentikasi Login Pengguna berdasarkan NIP (Kolom C) dan Password (Kolom D)
+ * Role (Kolom E) didapatkan secara otomatis dari database
  */
 function loginUser(data) {
   try {
     const inputNip = String(data.nip || "").trim();
     const inputPassword = String(data.password || "").trim();
-    const inputRole = String(data.role || "").trim();
     
-    if (!inputNip || !inputPassword || !inputRole) {
-      return { success: false, message: "NIP, Password, dan Role wajib diisi!" };
+    if (!inputNip || !inputPassword) {
+      return { success: false, message: "NIP dan Password wajib diisi!" };
     }
 
     let doc;
@@ -153,9 +153,9 @@ function loginUser(data) {
       const timKerja = String(values[i][1] || "").trim() || "Lainnya";
       const nip = String(values[i][2] || "").trim();
       const password = String(values[i][3] || "").trim();
-      const role = String(values[i][4] || "").trim();
+      const role = String(values[i][4] || "").trim() || "Ketua Tim";
 
-      if (nip === inputNip && password === inputPassword && role.toLowerCase() === inputRole.toLowerCase()) {
+      if (nip === inputNip && password === inputPassword) {
         return {
           success: true,
           message: "Login berhasil!",
@@ -169,7 +169,7 @@ function loginUser(data) {
       }
     }
 
-    return { success: false, message: "NIP, Password, atau Role tidak sesuai!" };
+    return { success: false, message: "NIP atau Password tidak sesuai!" };
   } catch (error) {
     Logger.log("Error loginUser: " + error.toString());
     return { success: false, message: "Gagal login: " + error.toString() };
@@ -187,8 +187,8 @@ function saveRecord(data) {
       data.nama,
       data.hari,
       data.tanggal,
-      data.waktuKeluar, // initially "-"
-      data.waktuKembali, // initially "-"
+      data.waktuKeluar,
+      data.waktuKembali,
       data.keterangan || "-",
       timestamp,
       sessionId
@@ -217,7 +217,6 @@ function findRowBySessionOrEmployee(sessionId, employeeName) {
     if (sessionId) {
       for (let i = 1; i < values.length; i++) {
         if (values[i].length > 7 && String(values[i][7]).trim() === String(sessionId).trim()) {
-          // Validasi kecocokan nama pegawai untuk isolasi data
           if (String(values[i][0]).trim() === employeeName.trim()) {
             return i + 1; // 1-indexed row number
           }
@@ -265,7 +264,6 @@ function deleteRecordSafe(sessionId, employeeName) {
       return { success: false, message: "Sesi aktif tidak ditemukan atau sudah dihapus." };
     }
     
-    // Melakukan penghapusan baris pada spreadsheet secara fisik hanya pada baris sesi pegawai bersangkutan
     sheet.deleteRow(rowIndex);
     return { success: true, message: "Sesi berhasil dibatalkan dan rencana kegiatan dihapus dari database SIKEMAS secara permanen." };
   } catch (error) {
@@ -350,8 +348,6 @@ function getRecordsInternal(employeeName) {
   }
 }
 
-// Wrapper API untuk dipanggil dari client side (index.html)
-
 function getRecords(data) {
   let employeeName = "";
   if (data && typeof data === 'object') {
@@ -399,7 +395,6 @@ function checkSession(data) {
   }
 }
 
-// Handler request HTTP POST (CORS-compliant) untuk pengujian lokal/eksternal
 function doPost(e) {
   let requestData;
   try {
@@ -487,7 +482,7 @@ function doPost(e) {
 function autoFixExpiredSessions(sheet, rows, displayRows) {
   if (!rows || rows.length <= 1) return;
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // Awal hari berjalan
+  today.setHours(0, 0, 0, 0);
   
   for (let i = 1; i < rows.length; i++) {
     const raw = rows[i];
@@ -506,16 +501,15 @@ function autoFixExpiredSessions(sheet, rows, displayRows) {
         const cleanDate = rawDate.split('T')[0];
         const parts = cleanDate.split('-');
         if (parts.length === 3) {
-          if (parts[0].length === 4) { // YYYY-MM-DD
+          if (parts[0].length === 4) {
             recDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-          } else { // DD-MM-YYYY
+          } else {
             recDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
           }
         }
       }
       
       if (recDate && recDate.getTime() < today.getTime()) {
-        // Sesi berasal dari hari sebelum hari berjalan (sudah melewati 24.00 WIB). Set otomatis Jam Kembali = 16:00!
         try {
           sheet.getRange(i + 1, 5).setValue("'16:00");
           rows[i][4] = "16:00";
@@ -540,7 +534,6 @@ function getAllRecords() {
     
     if (rows.length <= 1) return { success: true, data: [] };
 
-    // Jalankan auto-fix untuk sesi terlewat 24.00 WIB
     autoFixExpiredSessions(sheet, rows, displayRows);
     
     const records = [];
@@ -554,12 +547,12 @@ function getAllRecords() {
         const d = rawDate.getDate().toString().padStart(2, '0');
         const m = (rawDate.getMonth() + 1).toString().padStart(2, '0');
         const y = rawDate.getFullYear();
-        formattedDate = `${d}-${m}-${y}`; // Format DD-MM-YYYY
+        formattedDate = `${d}-${m}-${y}`;
       } else if (typeof rawDate === 'string' && rawDate.includes('-')) {
         const cleanDate = rawDate.split('T')[0];
         const parts = cleanDate.split('-');
         if (parts.length === 3) {
-          if (parts[0].length === 4) { // YYYY-MM-DD
+          if (parts[0].length === 4) {
             formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
           } else {
             formattedDate = cleanDate;
@@ -595,7 +588,6 @@ function getAllRecords() {
       });
     }
     
-    // Urutkan berdasarkan timestamp descending
     records.sort((a, b) => {
       const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
       const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
@@ -609,7 +601,6 @@ function getAllRecords() {
   }
 }
 
-// Helper hitung durasi dalam menit
 function hitungDurasiMenit(keluar, kembali) {
   try {
     const kParts = keluar.split(':');
@@ -618,14 +609,13 @@ function hitungDurasiMenit(keluar, kembali) {
       const kMin = parseInt(kParts[0], 10) * 60 + parseInt(kParts[1], 10);
       const bMin = parseInt(bParts[0], 10) * 60 + parseInt(bParts[1], 10);
       let diff = bMin - kMin;
-      if (diff < 0) diff += 24 * 60; // handling lewat tengah malam
+      if (diff < 0) diff += 24 * 60;
       return diff;
     }
   } catch(e) {}
   return null;
 }
 
-// Helper format durasi ke teks jam/menit
 function formatDurasi(menit) {
   if (menit === null || menit < 0) return "-";
   const jam = Math.floor(menit / 60);
@@ -636,7 +626,6 @@ function formatDurasi(menit) {
   return `${sisaMenit} menit`;
 }
 
-// Mengambil URL spreadsheet aktif secara dinamis
 function getSpreadsheetUrl() {
   try {
     return SpreadsheetApp.getActiveSpreadsheet().getUrl();
@@ -650,7 +639,6 @@ function getSpreadsheetUrl() {
   return "#";
 }
 
-// Mengambil URL script web app secara dinamis
 function getScriptUrl() {
   try {
     return ScriptApp.getService().getUrl();
@@ -659,7 +647,6 @@ function getScriptUrl() {
   }
 }
 
-// Admin menyelesaikan sesi secara paksa
 function adminForceCompleteSession(sessionId, employeeName, kembaliTime) {
   try {
     const sheet = getSheet();
@@ -669,14 +656,13 @@ function adminForceCompleteSession(sessionId, employeeName, kembaliTime) {
       return { success: false, message: "Sesi aktif tidak ditemukan di database." };
     }
     
-    sheet.getRange(rowIndex, 5).setValue("'" + kembaliTime); // Waktu Kembali (Kolom E)
+    sheet.getRange(rowIndex, 5).setValue("'" + kembaliTime);
     return { success: true, message: `Sesi ${employeeName} berhasil diselesaikan pada pukul ${kembaliTime}.` };
   } catch (error) {
     return { success: false, message: "Gagal menyelesaikan sesi: " + error.toString() };
   }
 }
 
-// Admin menghapus log secara paksa
 function adminDeleteRecord(sessionId, employeeName) {
   try {
     return deleteRecordSafe(sessionId, employeeName);
