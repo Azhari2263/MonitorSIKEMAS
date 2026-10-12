@@ -465,6 +465,9 @@ function doPost(e) {
       case 'adminDeleteRecord':
         result = adminDeleteRecord(requestData.sessionId, requestData.nama);
         break;
+      case 'updatePassword':
+        result = updatePassword(requestData);
+        break;
       default:
         result = { success: false, message: "Aksi tidak dikenal: " + action };
     }
@@ -535,6 +538,32 @@ function getAllRecords() {
     if (rows.length <= 1) return { success: true, data: [] };
 
     autoFixExpiredSessions(sheet, rows, displayRows);
+
+    // Ambil data tim kerja pegawai dari sheet User untuk pemetaan tim
+    let doc;
+    try { doc = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) { doc = null; }
+    if (!doc) {
+      const properties = PropertiesService.getScriptProperties();
+      let sheetId = properties.getProperty("SPREADSHEET_ID");
+      if (sheetId) {
+        try { doc = SpreadsheetApp.openById(sheetId); } catch(e) { doc = null; }
+      }
+    }
+    const userTeamMap = {};
+    if (doc) {
+      const userSheet = doc.getSheetByName("User");
+      if (userSheet) {
+        const uLastRow = userSheet.getLastRow();
+        if (uLastRow > 1) {
+          const uVals = userSheet.getRange(2, 1, uLastRow - 1, Math.max(userSheet.getLastColumn(), 2)).getValues();
+          uVals.forEach(uRow => {
+            const uNama = String(uRow[0] || "").trim().toLowerCase();
+            const uTim = String(uRow[1] || "").trim();
+            if (uNama) userTeamMap[uNama] = uTim;
+          });
+        }
+      }
+    }
     
     const records = [];
     for (let i = 1; i < rows.length; i++) {
@@ -574,8 +603,12 @@ function getAllRecords() {
         durasiTeks = "Sedang Keluar";
       }
       
+      const empName = String(raw[0] || "-").trim();
+      const empTeam = userTeamMap[empName.toLowerCase()] || "-";
+
       records.push({
-        nama: String(raw[0] || "-"),
+        nama: empName,
+        timKerja: empTeam,
         hari: String(raw[1] || "-"),
         tanggal: String(formattedDate || "-"),
         waktuKeluar: waktuKeluar,
@@ -668,5 +701,67 @@ function adminDeleteRecord(sessionId, employeeName) {
     return deleteRecordSafe(sessionId, employeeName);
   } catch (error) {
     return { success: false, message: "Gagal menghapus log: " + error.toString() };
+  }
+}
+
+/**
+ * Memperbarui Password Akun Pegawai pada sheet "User"
+ * data: { nip, oldPassword, newPassword }
+ */
+function updatePassword(data) {
+  try {
+    const inputNip = String((data && data.nip) || "").trim();
+    const oldPassword = String((data && data.oldPassword) || "").trim();
+    const newPassword = String((data && data.newPassword) || "").trim();
+
+    if (!inputNip) {
+      return { success: false, message: "NIP pengguna tidak valid!" };
+    }
+    if (!oldPassword || !newPassword) {
+      return { success: false, message: "Password lama dan password baru wajib diisi!" };
+    }
+    if (newPassword.length < 4) {
+      return { success: false, message: "Password baru minimal 4 karakter!" };
+    }
+
+    let doc;
+    try { doc = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) { doc = null; }
+    if (!doc) {
+      const properties = PropertiesService.getScriptProperties();
+      let sheetId = properties.getProperty("SPREADSHEET_ID");
+      if (sheetId) {
+        try { doc = SpreadsheetApp.openById(sheetId); } catch(e) { doc = null; }
+      }
+    }
+    if (!doc) return { success: false, message: "Database Spreadsheet tidak ditemukan." };
+
+    let sheet = doc.getSheetByName("User");
+    if (!sheet) return { success: false, message: "Sheet User tidak ditemukan di database." };
+
+    const lastRow = sheet.getLastRow();
+    if (lastRow <= 1) return { success: false, message: "Data pengguna tidak ditemukan di database." };
+
+    const values = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
+    for (let i = 0; i < values.length; i++) {
+      const nip = String(values[i][2] || "").trim();
+      const currentPassword = String(values[i][3] || "").trim();
+
+      if (nip === inputNip) {
+        if (currentPassword !== oldPassword) {
+          return { success: false, message: "Password lama tidak sesuai!" };
+        }
+        // Kolom D (ke-4) adalah Password
+        sheet.getRange(i + 2, 4).setValue(newPassword);
+        return { 
+          success: true, 
+          message: "Password berhasil diperbarui! Silakan gunakan password baru pada login berikutnya." 
+        };
+      }
+    }
+
+    return { success: false, message: "Akun pengguna dengan NIP tersebut tidak ditemukan." };
+  } catch (error) {
+    Logger.log("Error updatePassword: " + error.toString());
+    return { success: false, message: "Gagal memperbarui password: " + error.toString() };
   }
 }
