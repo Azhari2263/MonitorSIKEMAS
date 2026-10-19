@@ -625,6 +625,20 @@
                                             <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-bpsBlue"></div>
                                         </label>
                                     </div>
+                                    <!-- Auto Jam Keluar (Khusus Role Admin) -->
+                                    <div id="dash-auto-clockout-item" class="hidden flex items-center justify-between p-3 rounded-xl bg-blue-50/40 border border-blue-100">
+                                        <div>
+                                            <p class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                                                <span>Auto Jam Keluar</span>
+                                                <span class="text-[9px] px-1.5 py-0.5 bg-blue-100 text-bpsBlue font-bold rounded">Admin</span>
+                                            </p>
+                                            <p id="dash-auto-clockout-desc" class="text-[10px] text-slate-400">10 menit setelah rencana disimpan</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="dash-toggle-auto-jam-keluar" onchange="handleToggleAutoJamKeluar(this.checked)" class="sr-only peer">
+                                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-bpsBlue"></div>
+                                        </label>
+                                    </div>
                                     <button onclick="switchTab('manage', document.getElementById('sidebar-nav-manage'))"
                                         class="w-full flex items-center justify-between p-3 rounded-xl bg-blue-50/50 hover:bg-blue-50 border border-blue-100/50 text-bpsBlue font-bold text-xs transition-all">
                                         <span>Kelola Sesi Aktif</span>
@@ -878,6 +892,33 @@
                             <p class="text-xs text-slate-400 font-medium">Panel khusus untuk menyelesaikan atau membatalkan sesi keluar-masuk secara langsung.</p>
                         </div>
 
+                        <!-- Admin Only: Pengaturan Auto Jam Keluar -->
+                        <div id="admin-auto-clockout-card" class="hidden p-4 rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50/70 via-indigo-50/30 to-slate-50 transition-all">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div class="flex items-start sm:items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-bpsBlue text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-bpsBlue/20">
+                                        <i class="fa-solid fa-clock-rotate-left text-base"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <h3 class="text-xs font-bold text-slate-800">Auto Jam Keluar (10 Menit)</h3>
+                                            <span id="badge-auto-jam-keluar" class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600 uppercase tracking-wider">Memuat...</span>
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                                            Jika diaktifkan, pegawai yang telah menyimpan rencana kegiatan tetapi lupa menekan tombol <b>Jam Keluar</b> akan otomatis dicatat keluar oleh sistem <b>10 menit</b> setelah rencana disimpan.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 self-end sm:self-center bg-white/80 py-1.5 px-3 rounded-xl border border-blue-100/60 shadow-sm">
+                                    <span id="label-toggle-auto-clockout" class="text-xs font-bold text-slate-600">Nonaktif</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="toggle-auto-jam-keluar" onchange="handleToggleAutoJamKeluar(this.checked)" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bpsBlue"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Active Outings List for Admin / Supervisor / Ketua Tim -->
                         <div class="space-y-4">
                             <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl text-xs text-bpsBlue leading-relaxed flex items-start gap-2.5">
@@ -1078,6 +1119,10 @@
                 closeCustomConfirm();
                 localStorage.removeItem('sikemas_monitoring_user');
                 currentUser = null;
+                const cardAutoManage = document.getElementById('admin-auto-clockout-card');
+                const itemAutoDash = document.getElementById('dash-auto-clockout-item');
+                if (cardAutoManage) cardAutoManage.classList.add('hidden');
+                if (itemAutoDash) itemAutoDash.classList.add('hidden');
                 showLoginScreen(true);
             });
         }
@@ -1137,12 +1182,20 @@
             // Fitur Database Sheet dan Buka Google Spreadsheet Database hanya muncul untuk Role Admin
             const elDash = document.getElementById('db-sheet-link-dash');
             const elRiw = document.getElementById('db-sheet-link-riwayat');
+            const cardAutoManage = document.getElementById('admin-auto-clockout-card');
+            const itemAutoDash = document.getElementById('dash-auto-clockout-item');
+
             if (currentUser.role === 'Admin') {
                 if (elDash) elDash.classList.remove('hidden');
                 if (elRiw) elRiw.classList.remove('hidden');
+                if (cardAutoManage) cardAutoManage.classList.remove('hidden');
+                if (itemAutoDash) itemAutoDash.classList.remove('hidden');
+                loadAutoJamKeluarSetting();
             } else {
                 if (elDash) elDash.classList.add('hidden');
                 if (elRiw) elRiw.classList.add('hidden');
+                if (cardAutoManage) cardAutoManage.classList.add('hidden');
+                if (itemAutoDash) itemAutoDash.classList.add('hidden');
             }
         }
 
@@ -1895,6 +1948,79 @@
                     }
                 }
             );
+        }
+
+        // ================= PENGATURAN AUTO JAM KELUAR (KHUSUS ROLE ADMIN) =================
+        let isAutoJamKeluarActive = false;
+
+        async function loadAutoJamKeluarSetting() {
+            if (!currentUser || currentUser.role !== 'Admin') return;
+            try {
+                const res = await callAppsScript('getAutoJamKeluarSetting');
+                if (res && res.success) {
+                    isAutoJamKeluarActive = !!res.enabled;
+                    updateAutoJamKeluarUI(isAutoJamKeluarActive);
+                }
+            } catch (err) {
+                console.error("Gagal memuat pengaturan Auto Jam Keluar:", err);
+            }
+        }
+
+        async function handleToggleAutoJamKeluar(isChecked) {
+            if (!currentUser || currentUser.role !== 'Admin') {
+                showCustomAlert("Akses Ditolak", "Hanya role Admin yang memiliki hak akses untuk mengubah pengaturan Auto Jam Keluar.", "error");
+                updateAutoJamKeluarUI(isAutoJamKeluarActive);
+                return;
+            }
+
+            showLoader(true);
+            try {
+                const res = await callAppsScript('setAutoJamKeluarSetting', {
+                    role: currentUser.role,
+                    nip: currentUser.nip,
+                    enabled: isChecked
+                });
+
+                showLoader(false);
+                if (res && res.success) {
+                    isAutoJamKeluarActive = !!res.enabled;
+                    updateAutoJamKeluarUI(isAutoJamKeluarActive);
+                    showCustomAlert("Pengaturan Disimpan", res.message || `Fitur Auto Jam Keluar berhasil ${isAutoJamKeluarActive ? 'diaktifkan' : 'dinonaktifkan'}.`, "success");
+                    reloadData(true);
+                } else {
+                    showCustomAlert("Gagal", (res && res.message) ? res.message : "Gagal mengubah pengaturan Auto Jam Keluar.", "error");
+                    updateAutoJamKeluarUI(isAutoJamKeluarActive);
+                }
+            } catch (err) {
+                showLoader(false);
+                showCustomAlert("Koneksi Error", "Gagal menghubungi server: " + err.toString(), "error");
+                updateAutoJamKeluarUI(isAutoJamKeluarActive);
+            }
+        }
+
+        function updateAutoJamKeluarUI(enabled) {
+            const toggleManage = document.getElementById('toggle-auto-jam-keluar');
+            const toggleDash = document.getElementById('dash-toggle-auto-jam-keluar');
+            const badge = document.getElementById('badge-auto-jam-keluar');
+            const label = document.getElementById('label-toggle-auto-clockout');
+
+            if (toggleManage) toggleManage.checked = !!enabled;
+            if (toggleDash) toggleDash.checked = !!enabled;
+
+            if (badge) {
+                if (enabled) {
+                    badge.textContent = "AKTIF";
+                    badge.className = "text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase tracking-wider";
+                } else {
+                    badge.textContent = "NONAKTIF";
+                    badge.className = "text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 uppercase tracking-wider";
+                }
+            }
+
+            if (label) {
+                label.textContent = enabled ? "Aktif" : "Nonaktif";
+                label.className = enabled ? "text-xs font-bold text-emerald-600" : "text-xs font-bold text-slate-500";
+            }
         }
 
         // ================= EXPORT EXCEL LOGIC (SheetJS) =================

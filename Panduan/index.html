@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panduan Penggunaan SIKEMAS - BPS Kalbar</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--blue:#005aa9;--dark:#003768;--orange:#f29400;--light:#e8f1fb;--g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g400:#94a3b8;--g600:#475569;--g800:#1e293b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#0f172a;color:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+#pres{flex:1;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transform:translateX(60px);transition:all .5s cubic-bezier(.4,0,.2,1);pointer-events:none}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:all}
+.slide.exit{opacity:0;transform:translateX(-60px)}
+#ctrl{background:rgba(15,23,42,.97);border-top:1px solid rgba(255,255,255,.08);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
+.bn{display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;transition:all .2s;background:rgba(255,255,255,.08);color:#cbd5e1}
+.bn:hover:not(:disabled){background:var(--blue);color:#fff}
+.bn:disabled{opacity:.3;cursor:not-allowed}
+#sc{font-size:13px;font-weight:700;color:#94a3b8;min-width:70px;text-align:center}
+#dots{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:all .3s;border:none}
+.dot.active{background:var(--orange);width:24px;border-radius:4px}
+#s1{background:linear-gradient(135deg,#003768,#005aa9,#0077cc)}
+.cc{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:32px;text-align:center}
+.clogo{width:90px;height:90px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:40px;color:#fff;margin-bottom:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.ctag{background:rgba(242,148,0,.22);border:1px solid rgba(242,148,0,.4);color:#fbbf24;padding:5px 18px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:18px}
+.ctitle{font-size:clamp(26px,4vw,50px);font-weight:900;line-height:1.1;margin-bottom:14px;letter-spacing:-1px}
+.ctitle span{color:var(--orange)}
+.csub{font-size:clamp(13px,1.8vw,17px);font-weight:500;color:rgba(255,255,255,.75);margin-bottom:36px;max-width:480px}
+.cdiv{width:56px;height:3px;background:var(--orange);border-radius:2px;margin:0 auto 28px}
+.cfoot{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.cfi{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);background:rgba(255,255,255,.08);padding:7px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1)}
+.sl{display:flex;flex-direction:column;height:100%;background:var(--g50);color:var(--g800)}
+.sh{background:var(--blue);padding:18px 36px;display:flex;align-items:center;gap:14px;flex-shrink:0}
+.shi{width:42px;height:42px;background:rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff}
+.sht h2{font-size:clamp(13px,2vw,19px);font-weight:800;color:#fff}
+.sht p{font-size:10px;color:rgba(255,255,255,.7);font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.snb{margin-left:auto;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8);font-size:10px;font-weight:800;padding:4px 11px;border-radius:100px}
+.sb{flex:1;padding:28px 36px;overflow-y:auto;display:flex;flex-direction:column;gap:20px}
+.c2{background:#fff;border-radius:16px;padding:22px;border:1px solid var(--g100);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sl2{display:flex;flex-direction:column;gap:14px}
+.si{display:flex;gap:14px;align-items:flex-start}
+.sn{width:34px;height:34px;border-radius:10px;background:var(--blue);color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sc2 h4{font-size:13px;font-weight:700;color:var(--g800);margin-bottom:3px}
+.sc2 p{font-size:11.5px;color:var(--g600);line-height:1.6}
+.cal{display:flex;gap:12px;align-items:flex-start;padding:14px 18px;border-radius:13px;font-size:12px;line-height:1.6}
+.cal.info{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8}
+.cal.warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.cal.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+.cal.err{background:#fff1f2;border:1px solid #fecdd3;color:#9f1239}
+.cal i{font-size:17px;margin-top:2px;flex-shrink:0}
+.fc{background:#fff;border-radius:13px;padding:18px;border:1px solid var(--g100);box-shadow:0 2px 6px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:10px}
+.fi2{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.fc h4{font-size:13px;font-weight:700;color:var(--g800)}
+.fc p{font-size:11px;color:var(--g600);line-height:1.55}
+.dt{width:100%;border-collapse:collapse;font-size:11.5px}
+.dt th{background:var(--blue);color:#fff;padding:9px 12px;text-align:left;font-weight:700;font-size:9.5px;letter-spacing:.5px;text-transform:uppercase}
+.dt th:first-child{border-radius:9px 0 0 0}
+.dt th:last-child{border-radius:0 9px 0 0}
+.dt td{padding:9px 12px;border-bottom:1px solid var(--g100);color:var(--g600);font-weight:500}
+.dt tr:last-child td{border-bottom:none}
+.bdg{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:100px;font-size:9.5px;font-weight:700}
+.bdg.k{background:#fef3c7;color:#92400e}
+.rt{width:100%;border-radius:12px;overflow:hidden;border:1px solid var(--g100)}
+.rr{display:grid;grid-template-columns:1fr 1fr 2fr;border-bottom:1px solid var(--g100)}
+.rr:last-child{border-bottom:none}
+.rr.hd{background:var(--dark)}
+.rr.hd div{color:rgba(255,255,255,.8);font-size:9.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.rr > div{padding:11px 14px;font-size:11.5px;font-weight:600;color:#374151;border-right:1px solid var(--g100)}
+.rr > div:last-child{border-right:none}
+.rr:not(.hd):nth-child(even){background:var(--g50)}
+.mk{background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--g200);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.mt{background:var(--blue);padding:9px 14px;display:flex;align-items:center;gap:8px}
+.rd{width:9px;height:9px;border-radius:50%;background:#ef4444}
+.yd{width:9px;height:9px;border-radius:50%;background:#eab308}
+.gd{width:9px;height:9px;border-radius:50%;background:#22c55e}
+.mt span{font-size:10px;color:rgba(255,255,255,.7);font-weight:600;margin-left:6px}
+.fw{display:flex;align-items:center;gap:0;justify-content:center;flex-wrap:wrap}
+.fs{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+.fb{background:var(--blue);color:#fff;padding:11px 14px;border-radius:11px;font-size:11px;font-weight:700;min-width:100px;text-align:center;line-height:1.4}
+.fb.or{background:var(--orange)}.fb.gr{background:#10b981}.fb.gy{background:#64748b}.fb.pu{background:#7c3aed}
+.flb{font-size:9.5px;color:var(--g400);font-weight:600}
+.farr{color:var(--g400);font-size:18px;padding:0 6px;flex-shrink:0}
+.slb{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--blue);display:flex;align-items:center;gap:9px;margin-bottom:2px}
+.slb::after{content:'';flex:1;height:2px;background:linear-gradient(to right,var(--light),transparent);border-radius:2px}
+.ol{display:block;width:44px;height:4px;background:var(--orange);border-radius:2px;margin-bottom:12px}
+h3.st{font-size:15px;font-weight:800;color:var(--g800);margin-bottom:12px}
+.cl{display:flex;flex-direction:column;gap:9px}
+.cli{display:flex;align-items:center;gap:9px;font-size:12px;color:#374151;font-weight:500}
+.ck{width:20px;height:20px;border-radius:5px;background:#d1fae5;color:#10b981;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+@keyframes su{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.slide.active .ctag{animation:su .6s .1s both}
+.slide.active .clogo{animation:su .6s 0s both}
+.slide.active .ctitle{animation:su .6s .2s both}
+.slide.active .csub{animation:su .6s .3s both}
+.slide.active .cdiv{animation:su .6s .4s both}
+.slide.active .cfoot{animation:su .6s .5s both}
+@media(max-width:768px){
+.sh{padding:13px 18px}.sb{padding:18px;gap:14px}
+.g2,.g3,.g4{grid-template-columns:1fr}
+.ctitle{font-size:26px}.fw{flex-direction:column}.farr{transform:rotate(90deg)}
+#ctrl{padding:8px 14px}.bn span{display:none}#dots{display:none}}
+</style>
+</head>
+<body>
+<div id="pres">
+
+<!-- SLIDE 1: COVER -->
+<div class="slide active" id="s1">
+<div style="position:absolute;width:550px;height:550px;background:rgba(255,255,255,.04);border-radius:50%;top:-180px;right:-130px;pointer-events:none"></div>
+<div style="position:absolute;width:380px;height:380px;background:rgba(242,148,0,.07);border-radius:50%;bottom:-80px;left:-80px;pointer-events:none"></div>
+<div class="cc">
+<div class="clogo"><i class="fa-solid fa-person-walking-arrow-right"></i></div>
+<div class="ctag">Dokumentasi &middot; Versi 1.0 &middot; 2026</div>
+<h1 class="ctitle">Panduan Penggunaan<br><span>SIKEMAS</span></h1>
+<p class="csub">Sistem Keterangan Keluar Masuk Pegawai<br>BPS Provinsi Kalimantan Barat</p>
+<div class="ctag">Khusus Supervisor dan Ketua TIM</div>
+<div class="cfoot">
+<div class="cfi"><i class="fa-solid fa-building-columns" style="color:#fbbf24"></i>BPS Provinsi Kalimantan Barat</div>
+<div class="cfi"><i class="fa-solid fa-users-gear" style="color:#fbbf24"></i>Tim Umum &amp; Humas</div>
+<div class="cfi"><i class="fa-solid fa-calendar-days" style="color:#fbbf24"></i>2026</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 2: APA ITU SIKEMAS -->
+<div class="slide" id="s2">
+<div class="sl">
+<div class="sh"><div class="shi"><i class="fa-solid fa-circle-info"></i></div><div class="sht"><p>Slide 01 &middot; Pengenalan</p><h2>Apa itu SIKEMAS?</h2></div><div class="snb">01/10</div></div>
+<div class="sb">
+<div class="g2">
+<div style="display:flex;flex-direction:column;gap:16px">
+
+<div class="c2">
+    <span class="ol"></span>
+
+    <h3 class="st">Tentang SIKEMAS</h3>
+
+    <p style="font-size: 12.5px; color: #475569; line-height: 1.8;">
+        <b>SIKEMAS</b> (Sistem Keterangan Keluar Masuk Pegawai) adalah
+        aplikasi berbasis web yang digunakan untuk mencatat dan memantau
+        aktivitas keluar-masuk pegawai BPS Provinsi Kalimantan Barat secara
+        <b>real-time</b>.
+    </p>
+
+    <p style="font-size: 12.5px; color: #475569; line-height: 1.8;">
+        SIKEMAS memiliki dua tautan akses yang disesuaikan dengan kebutuhan,
+        yaitu akses untuk pengguna dan akses untuk monitoring.
+    </p>
+
+    <div style="margin-top: 16px;">
+        <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">
+            1. Akses Pengguna
+        </h4>
+
+        <p style="font-size: 12.5px; color: #475569; line-height: 1.8; margin-top: 0;">
+            Digunakan oleh pegawai untuk melakukan pencatatan aktivitas
+            keluar-masuk kantor.
+            <br>
+            <a
+                href="https://s.bps.go.id/SIKEMAS6100"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: #2563eb; text-decoration: underline; overflow-wrap: anywhere;"
+            >
+                https://s.bps.go.id/SIKEMAS6100
+            </a>
+        </p>
+    </div>
+
+    <div style="margin-top: 12px;">
+        <h4 style="font-size: 13px; color: #1e293b; margin-bottom: 6px;">
+            2. Akses Monitoring
+        </h4>
+
+        <p style="font-size: 12.5px; color: #475569; line-height: 1.8; margin-top: 0;">
+            Digunakan untuk memantau aktivitas keluar-masuk pegawai
+            secara terpusat.
+            <br>
+            <a
+                href="https://s.bps.go.id/Monitor-SIKEMAS"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: #2563eb; text-decoration: underline; overflow-wrap: anywhere;"
+            >
+                https://s.bps.go.id/Monitor-SIKEMAS
+            </a>
+        </p>
+    </div>
+</div>
+<div class="cal info"><i class="fa-solid fa-lightbulb"></i><div><strong>Manfaat Utama:</strong> Menggantikan buku pencatatan manual dengan sistem digital terintegrasi ke Google Spreadsheet sebagai database.</div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<p class="slb">Fitur Unggulan</p>
+<div class="g4">
+<div class="fc"><div class="fi2" style="background:#eff6ff;color:#005aa9"><i class="fa-solid fa-gauge"></i></div><h4>Dashboard Real-Time</h4><p>Statistik diperbarui otomatis setiap 30 detik</p></div>
+<div class="fc"><div class="fi2" style="background:#fef3c7;color:#d97706"><i class="fa-solid fa-user-shield"></i></div><h4>Multi-Role Access</h4><p>3 level: Admin, Supervisor, Ketua Tim</p></div>
+<div class="fc"><div class="fi2" style="background:#f0fdf4;color:#16a34a"><i class="fa-solid fa-chart-line"></i></div><h4>Grafik Distribusi</h4><p>Visualisasi tren keluar pegawai per bulan</p></div>
+<div class="fc"><div class="fi2" style="background:#fff1f2;color:#e11d48"><i class="fa-solid fa-file-excel"></i></div><h4>Ekspor Excel</h4><p>Unduh riwayat ke file .xlsx kapan saja</p></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 3: ALUR KERJA -->
+<div class="slide" id="s3">
+<div class="sl">
+<div class="sh"><div class="shi"><i class="fa-solid fa-diagram-project"></i></div><div class="sht"><p>Slide 02 &middot; Alur Sistem</p><h2>Alur Kerja SIKEMAS</h2></div><div class="snb">02/10</div></div>
+<div class="sb">
+<div class="c2">
+<p class="slb">Alur Utama Penggunaan</p>
+<div style="margin-top:18px">
+<div class="fw" style="gap:2px">
+<div class="fs"><div class="fb"><i class="fa-solid fa-right-to-bracket" style="display:block;font-size:18px;margin-bottom:5px"></i>Masuk ke Aplikasi<br>SIKEMAS</div><div class="flb">Langkah 1</div></div>
+<i class="fa-solid fa-chevron-right farr"></i>
+<div class="fs"><div class="fb or"><i class="fa-solid fa-person-walking-arrow-right" style="display:block;font-size:18px;margin-bottom:5px"></i>Input Nama, Tanggal,<br>dan Rencana Kegiatan</div><div class="flb">Langkah 2</div></div>
+<i class="fa-solid fa-chevron-right farr"></i>
+<div class="fs"><div class="fb pu"><i class="fa-solid fa-clock" style="display:block;font-size:18px;margin-bottom:5px"></i>Tekan Jam<br>Keluar</div><div class="flb">Langkah 3</div></div>
+<i class="fa-solid fa-chevron-right farr"></i>
+<div class="fs"><div class="fb gr"><i class="fa-solid fa-person-circle-check" style="display:block;font-size:18px;margin-bottom:5px"></i>Tekan Jam<br>Kembali</div><div class="flb">Langkah 4</div></div>
+<i class="fa-solid fa-chevron-right farr"></i>
+<div class="fs"><div class="fb gy"><i class="fa-solid fa-database" style="display:block;font-size:18px;margin-bottom:5px"></i>Tersimpan<br>Database</div><div class="flb">Selesai</div></div>
+</div>
+</div>
+</div>
+<div class="g2">
+<div class="c2">
+<p class="slb">Halaman Pegawai</p>
+<div class="sl2" style="margin-top:12px">
+<div class="si"><div class="sn" style="background:#f59e0b">1</div><div class="sc2"><h4>Form Rencana Kegiatan</h4><p>Isi nama, tanggal, keperluan, dan rencana jam keluar/kembali.</p></div></div>
+<div class="si"><div class="sn" style="background:#8b5cf6">2</div><div class="sc2"><h4>Tombol Jam Keluar</h4><p>Ditekan saat pegawai meninggalkan kantor.</p></div></div>
+<div class="si"><div class="sn" style="background:#10b981">3</div><div class="sc2"><h4>Tombol Jam Kembali</h4><p>Ditekan saat tiba kembali, sesi selesai otomatis.</p></div></div>
+</div>
+</div>
+<div class="c2">
+<p class="slb">Halaman Monitoring</p>
+<div class="sl2" style="margin-top:12px">
+<div class="si"><div class="sn">A</div><div class="sc2"><h4>Dashboard Monitoring</h4><p>Melihat aktivitas keluar-masuk semua pegawai.</p></div></div>
+<div class="si"><div class="sn">B</div><div class="sc2"><h4>Pengelolaan Sesi</h4><p>Admin dapat menyelesaikan atau menghapus sesi.</p></div></div>
+<div class="si"><div class="sn">C</div><div class="sc2"><h4>Ekspor Data</h4><p>Unduh seluruh riwayat dalam format Excel.</p></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 4: HAK AKSES -->
+<div class="slide" id="s4">
+<div class="sl">
+<div class="sh"><div class="shi"><i class="fa-solid fa-user-shield"></i></div><div class="sht"><p>Slide 03 &middot; Hak Akses</p><h2>Peran &amp; Hak Akses Pengguna</h2></div><div class="snb">03/10</div></div>
+<div class="sb">
+<div class="cal info"><i class="fa-solid fa-circle-info"></i><div>Setiap pengguna Monitoring SIKEMAS memiliki <strong>role</strong> yang menentukan data yang bisa dilihat.</div></div>
+<div class="c2">
+<div class="rt">
+<div class="rr hd"><div>Role</div><div>Level Akses</div><div>Data yang Bisa Dilihat &amp; Dikelola</div></div>
+<div class="rr"><div><span style="display:inline-flex;align-items:center;gap:5px;background:#fee2e2;color:#dc2626;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700"><i class="fa-solid fa-crown"></i>Admin</span></div><div style="color:#dc2626;font-weight:700">Full Akses</div><div>&#10003; Seluruh data SEMUA pegawai dari semua tim. Dapat selesaikan &amp; hapus sesi siapapun.</div></div>
+<div class="rr"><div><span style="display:inline-flex;align-items:center;gap:5px;background:#fef3c7;color:#d97706;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700"><i class="fa-solid fa-user-tie"></i>Supervisor</span></div><div style="color:#d97706;font-weight:700">Full Akses (Terbatas)</div><div>&#10003; Seluruh data SEMUA pegawai. Dapat selesaikan &amp; hapus sesi siapapun.</div></div>
+<div class="rr"><div><span style="display:inline-flex;align-items:center;gap:5px;background:#dbeafe;color:#1d4ed8;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700"><i class="fa-solid fa-user-group"></i>Ketua Tim</span></div><div style="color:#1d4ed8;font-weight:700">Terbatas</div><div>&#10003; Hanya data <strong>tim kerjanya sendiri</strong>. Dapat kelola sesi anggota timnya.</div></div>
+</div>
+</div>
+<div class="g2">
+<div class="c2">
+<p class="slb">Data Login yang Diperlukan</p>
+<div class="sl2" style="margin-top:12px">
+<div class="si"><div style="width:34px;height:34px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-id-card" style="color:#005aa9;font-size:15px"></i></div><div class="sc2"><h4>NIP (Nomor Induk Pegawai)</h4><p>NIP yang terdiri atas 16 digit angka</p></div></div>
+<div class="si"><div style="width:34px;height:34px;border-radius:10px;background:#fef3c7;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fa-solid fa-lock" style="color:#d97706;font-size:15px"></i></div><div class="sc2"><h4>Password</h4><p>Password yang terdiri atas 8-20 karakter. Dapat diubah via fitur Update Password.</p></div></div>
+</div>
+</div>
+<div class="c2">
+<p class="slb">Struktur Sheet "User"</p>
+<table class="dt" style="margin-top:12px">
+<thead><tr><th>Kolom</th><th>Isi Data</th></tr></thead>
+<tbody>
+<tr><td><b>A</b> - Nama</td><td>Nama lengkap pegawai</td></tr>
+<tr><td><b>B</b> - Tim Kerja</td><td>Nama tim / unit kerja</td></tr>
+<tr><td><b>C</b> - NIP</td><td>Nomor Induk Pegawai</td></tr>
+<tr><td><b>D</b> - Password</td><td>Kata sandi akun</td></tr>
+<tr><td><b>E</b> - Role</td><td>Admin / Supervisor / Ketua Tim</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 5: LOGIN -->
+<div class="slide" id="s5">
+<div class="sl">
+<div class="sh"><div class="shi"><i class="fa-solid fa-right-to-bracket"></i></div><div class="sht"><p>Slide 04 &middot; Cara Penggunaan</p><h2>Langkah 1: Login ke Sistem</h2></div><div class="snb">04/10</div></div>
+<div class="sb">
+<div class="g2">
+<div style="display:flex;flex-direction:column;gap:14px">
+<div class="c2">
+<p class="slb">Cara Login</p>
+<div class="sl2" style="margin-top:12px">
+<div class="si"><div class="sn">1</div><div class="sc2"><h4>Buka URL Aplikasi</h4><p>Akses tautan SIKEMAS yang telah dibagikan oleh administrator <b>http://s.bps.go.id/Monitor-SIKEMAS</b>.</p></div></div>
+<div class="si"><div class="sn">2</div><div class="sc2"><h4>Masukkan NIP</h4><p>Isi kolom NIP dengan Nomor Induk Pegawai Anda.</p></div></div>
+<div class="si"><div class="sn">3</div><div class="sc2"><h4>Masukkan Password</h4><p>Klik ikon mata untuk melihat atau menyembunyikan password.</p></div></div>
+<div class="si"><div class="sn">4</div><div class="sc2"><h4>Klik "Masuk ke Dashboard"</h4><p>Jika berhasil, dashboard utama akan langsung terbuka.</p></div></div>
+</div>
+</div>
+<div class="cal warn"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>Perhatian:</strong> Jika muncul "NIP atau Password tidak sesuai", periksa kembali data atau hubungi administrator.</div></div>
+</div>
+<div class="mk">
+<div class="mt"><div class="rd"></div><div class="yd"></div><div class="gd"></div><span>SIKEMAS - Login</span></div>
+<div style="background:#0f172a;padding:28px 20px;min-height:340px;display:flex;align-items:center;justify-content:center">
+<div style="background:rgba(15,23,42,.97);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:26px;width:100%;max-width:270px;text-align:center">
+<div style="width:58px;height:58px;background:linear-gradient(135deg,#005aa9,#0077cc);border-radius:16px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff"><i class="fa-solid fa-person-walking-arrow-right"></i></div>
+<h3 style="color:#fff;font-size:14px;font-weight:800;margin-bottom:3px">Monitoring SIKEMAS</h3>
+<p style="color:#94a3b8;font-size:9.5px;font-weight:600;margin-bottom:18px">BPS Provinsi Kalimantan Barat</p>
+<div style="margin-bottom:10px;text-align:left"><label style="color:#94a3b8;font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase">NIP</label><div style="display:flex;align-items:center;gap:7px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:9px 11px;margin-top:5px"><i class="fa-solid fa-id-card" style="color:#64748b;font-size:10px"></i><span style="color:#64748b;font-size:10px;font-family:monospace">19xxxxxxxxxxxxxx</span></div></div>
+<div style="margin-bottom:16px;text-align:left"><label style="color:#94a3b8;font-size:9.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase">Password</label><div style="display:flex;align-items:center;gap:7px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:9px 11px;margin-top:5px"><i class="fa-solid fa-lock" style="color:#64748b;font-size:10px"></i><span style="color:#64748b;font-size:10px">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span></div></div>
+<button style="width:100%;background:linear-gradient(135deg,#005aa9,#0077cc);color:#fff;border:none;border-radius:11px;padding:11px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:inherit">Masuk ke Dashboard <i class="fa-solid fa-arrow-right"></i></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 6: DASHBOARD -->
+<div class="slide" id="s6">
+<div class="sl">
+<div class="sh"><div class="shi"><i class="fa-solid fa-gauge"></i></div><div class="sht"><p>Slide 05 &middot; Cara Penggunaan</p><h2>Langkah 2: Memahami Dashboard</h2></div><div class="snb">05/10</div></div>
+<div class="sb">
+<div class="cal ok"><i class="fa-solid fa-check-circle"></i><div>Setelah login, Anda masuk ke <strong>Dashboard Utama</strong> dengan ringkasan statistik aktivitas real-time yang diperbarui otomatis setiap <strong>30 detik</strong>.</div></div>
+<div class="g3">
+<div class="c2" style="border-top:3px solid #005aa9">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div class="fi2" style="background:#eff6ff;color:#005aa9;width:38px;height:38px;font-size:17px"><i class="fa-solid fa-address-book"></i></div><div><p style="font-size:9px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:1px">Kartu 1</p><h4 style="font-size:12.5px;color:#1e293b">Total Terdaftar</h4></div></div>
+<p style="font-size:11px;color:#475569;line-height:1.6">Jumlah pegawai yang sudah mengisi rencana kegiatan hari ini (termasuk belum keluar).</p>
+</div>
+<div class="c2" style="border-top:3px solid #f59e0b">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div class="fi2" style="background:#fef3c7;color:#d97706;width:38px;height:38px;font-size:17px"><i class="fa-solid fa-person-walking-arrow-right"></i></div><div><p style="font-size:9px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:1px">Kartu 2</p><h4 style="font-size:12.5px;color:#1e293b">Sedang Keluar</h4></div></div>
+<p style="font-size:11px;color:#475569;line-height:1.6">Pegawai yang masih di luar kantor (sudah tekan jam keluar, belum tekan jam kembali).</p>
+</div>
+<div class="c2" style="border-top:3px solid #10b981">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div class="fi2" style="background:#d1fae5;color:#065f46;width:38px;height:38px;font-size:17px"><i class="fa-solid fa-person-circle-check"></i></div><div><p style="font-size:9px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:1px">Kartu 3</p><h4 style="font-size:12.5px;color:#1e293b">Sudah Kembali</h4></div></div>
+<p style="font-size:11px;color:#475569;line-height:1.6">Pegawai yang sudah kembali ke kantor &mdash; sesi keluar-masuk telah selesai tercatat.</p>
+</div>
+</div>
+<div class="c2">
+<p class="slb">Tabel Live: Pegawai Sedang Keluar</p>
+<table class="dt" style="margin-top:12px">
+<thead><tr><th>Nama Pegawai</th><th>Jam Keluar</th><th>Durasi</th><th>Keperluan</th></tr></thead>
+<tbody>
+<tr><td><b>Ahmad Fauzi</b></td><td><span class="bdg k"><i class="fa-solid fa-circle"></i>09:30</span></td><td>1 jam 20 mnt</td><td>Pengambilan dokumen ke Kanwil</td></tr>
+<tr><td><b>Siti Rahayu</b></td><td><span class="bdg k"><i class="fa-solid fa-circle"></i>10:15</span></td><td>35 menit</td><td>Rapat koordinasi di instansi lain</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 7: NAVIGASI -->
+<div class="slide" id="s7">
+<div class="sl">
+<div class="sh"><div class="shi"><i class="fa-solid fa-bars"></i></div><div class="sht"><p>Slide 06 &middot; Navigasi</p><h2>Menu Navigasi &amp; Fitur Utama</h2></div><div class="snb">06/10</div></div>
+<div class="sb">
+<div class="g2">
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="fc" style="flex-direction:row;align-items:flex-start;gap:12px"><div class="fi2" style="background:#eff6ff;color:#005aa9;font-size:17px;flex-shrink:0"><i class="fa-solid fa-gauge"></i></div><div><h4>&#128202; Dashboard</h4><p>Statistik real-time: total terdaftar, sedang keluar, sudah kembali. Tabel live pegawai yang sedang di luar.</p></div></div>
+<div class="fc" style="flex-direction:row;align-items:flex-start;gap:12px"><div class="fi2" style="background:#fef3c7;color:#d97706;font-size:17px;flex-shrink:0"><i class="fa-solid fa-list-check"></i></div><div><h4>&#128203; Detail Hari Ini</h4><p>Daftar lengkap pegawai keluar hari ini. Bisa difilter &amp; diurutkan berdasarkan nama, jam keluar/kembali.</p></div></div>
+<div class="fc" style="flex-direction:row;align-items:flex-start;gap:12px"><div class="fi2" style="background:#d1fae5;color:#065f46;font-size:17px;flex-shrink:0"><i class="fa-solid fa-chart-line"></i></div><div><h4>&#128200; Distribusi Keluar</h4><p>Grafik bar (frekuensi harian) &amp; line (kumulatif). Filter berdasarkan bulan dan tahun.</p></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="fc" style="flex-direction:row;align-items:flex-start;gap:12px"><div class="fi2" style="background:#ede9fe;color:#7c3aed;font-size:17px;flex-shrink:0"><i class="fa-solid fa-clock-rotate-left"></i></div><div><h4>&#128220; Riwayat Aktivitas</h4><p>Semua riwayat keluar-masuk dengan filter nama, tanggal, bulan, tahun, status. Dilengkapi <b>Export Excel</b>.</p></div></div>
+<div class="fc" style="flex-direction:row;align-items:flex-start;gap:12px"><div class="fi2" style="background:#fff1f2;color:#e11d48;font-size:17px;flex-shrink:0"><i class="fa-solid fa-sliders"></i></div><div><h4>&#9881; Pengelolaan Sesi</h4><p>Panel Admin/Supervisor/Ketua Tim untuk menyelesaikan sesi atau menghapus data pegawai yang lupa tombol kembali.</p></div></div>
+<div class="cal info"><i class="fa-solid fa-mobile-screen-button"></i><div><strong>Sidebar:</strong> Klik ikon &#9776; di pojok kiri atas untuk membuka/menutup menu navigasi di semua perangkat.</div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 8: RIWAYAT & EKSPOR -->
+<div class="slide" id="s8">
+<div class="sl">
+<div class="sh"><div class="shi"><i class="fa-solid fa-clock-rotate-left"></i></div><div class="sht"><p>Slide 07 &middot; Riwayat &amp; Ekspor</p><h2>Riwayat Aktivitas &amp; Ekspor Data</h2></div><div class="snb">07/10</div></div>
+<div class="sb">
+<div class="g2">
+<div style="display:flex;flex-direction:column;gap:14px">
+<div class="c2">
+<p class="slb">Filter Riwayat yang Tersedia</p>
+<div class="cl" style="margin-top:12px">
+<div class="cli"><div class="ck"><i class="fa-solid fa-check"></i></div><span><b>Nama Pegawai</b> &mdash; Pencarian teks bebas</span></div>
+<div class="cli"><div class="ck"><i class="fa-solid fa-check"></i></div><span><b>Tanggal Spesifik</b> &mdash; Date picker kalender</span></div>
+<div class="cli"><div class="ck"><i class="fa-solid fa-check"></i></div><span><b>Bulan</b> &mdash; Dropdown Januari s.d. Desember</span></div>
+<div class="cli"><div class="ck"><i class="fa-solid fa-check"></i></div><span><b>Tahun</b> &mdash; Dropdown 2024 s.d. 2028</span></div>
+<div class="cli"><div class="ck"><i class="fa-solid fa-check"></i></div><span><b>Status</b> &mdash; Sedang Keluar / Selesai</span></div>
+</div>
+</div>
+<div class="c2">
+<p class="slb">Cara Ekspor ke Excel</p>
+<div class="sl2" style="margin-top:12px">
+<div class="si"><div class="sn" style="background:#10b981">1</div><div class="sc2"><h4>Buka Tab Riwayat Aktivitas</h4><p>Klik menu "Riwayat Aktivitas" pada sidebar navigasi.</p></div></div>
+<div class="si"><div class="sn" style="background:#10b981">2</div><div class="sc2"><h4>Gunakan Filter (Opsional)</h4><p>Filter data berdasarkan bulan/tahun/nama sesuai kebutuhan.</p></div></div>
+<div class="si"><div class="sn" style="background:#10b981">3</div><div class="sc2"><h4>Klik "Export Excel"</h4><p>File .xlsx diunduh otomatis berisi data yang sedang ditampilkan.</p></div></div>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<div class="c2">
+<p class="slb">Kolom Data di Riwayat</p>
+<table class="dt" style="margin-top:12px">
+<thead><tr><th>Kolom</th><th>Keterangan</th></tr></thead>
+<tbody>
+<tr><td><b>Nama</b></td><td>Nama lengkap pegawai</td></tr>
+<tr><td><b>Tanggal</b></td><td>Tanggal kegiatan keluar</td></tr>
+<tr><td><b>Jam Keluar</b></td><td>Waktu meninggalkan kantor</td></tr>
+<tr><td><b>Jam Kembali</b></td><td>Waktu tiba kembali di kantor</td></tr>
+<tr><td><b>Durasi</b></td><td>Total waktu di luar kantor</td></tr>
+<tr><td><b>Keterangan</b></td><td>Keperluan / alasan keluar</td></tr>
+<tr><td><b>Status</b></td><td>Sedang Keluar / Selesai</td></tr>
+</tbody>
+</table>
+</div>
+<div class="cal info"><i class="fa-solid fa-circle-info"></i><div><strong>Auto-Fix Sesi:</strong> Jika pegawai lupa tombol kembali dan hari berganti, sistem otomatis mengisi jam kembali dengan <b>16:00</b>.</div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 9: PENGELOLAAN SESI -->
+<div class="slide" id="s9">
+<div class="sl">
+<div class="sh"><div class="shi"><i class="fa-solid fa-sliders"></i></div><div class="sht"><p>Slide 08 &middot; Admin &amp; Keamanan</p><h2>Pengelolaan Sesi &amp; Update Password</h2></div><div class="snb">08/10</div></div>
+<div class="sb">
+<div class="g2">
+<div style="display:flex;flex-direction:column;gap:14px">
+<div class="c2" style="border-left:4px solid #005aa9">
+<p class="slb">Pengelolaan Sesi (Admin)</p>
+<p style="font-size:12px;color:#475569;margin:10px 0 14px;line-height:1.7">Panel khusus <b>Admin, Supervisor,</b> dan <b>Ketua Tim</b> untuk mengelola sesi aktif pegawai yang lupa menekan tombol kembali.</p>
+<div class="sl2">
+<div class="si"><div class="sn" style="background:#005aa9"><i class="fa-solid fa-clock-rotate-left" style="font-size:11px"></i></div><div class="sc2"><h4>Tombol "Selesaikan"</h4><p>Klik tombol biru untuk input jam kembali secara manual bagi pegawai yang bersangkutan.</p></div></div>
+<div class="si"><div class="sn" style="background:#e11d48"><i class="fa-solid fa-trash" style="font-size:11px"></i></div><div class="sc2"><h4>Tombol "Hapus"</h4><p>Menghapus baris sesi secara <b>permanen</b> dari database. Muncul konfirmasi sebelum eksekusi.</p></div></div>
+</div>
+</div>
+<div class="cal err"><i class="fa-solid fa-circle-exclamation"></i><div><strong>Perhatian:</strong> Penghapusan data bersifat <strong>permanen</strong> dan tidak dapat dibatalkan. Pastikan yakin sebelum menekan Hapus.</div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<div class="c2" style="border-left:4px solid #f59e0b">
+<p class="slb">Update Password Akun</p>
+<p style="font-size:12px;color:#475569;margin:10px 0 14px;line-height:1.7">Setiap pengguna dapat mengubah password akunnya sendiri melalui menu <b>Update Password</b> di sidebar atau header.</p>
+<div class="sl2">
+<div class="si"><div class="sn" style="background:#f59e0b">1</div><div class="sc2"><h4>Klik Ikon Kunci &#128273;</h4><p>Klik ikon kunci di header atau tombol "Update Password" di sidebar navigasi.</p></div></div>
+<div class="si"><div class="sn" style="background:#f59e0b">2</div><div class="sc2"><h4>Isi Password Lama</h4><p>Masukkan password saat ini untuk verifikasi identitas Anda.</p></div></div>
+<div class="si"><div class="sn" style="background:#f59e0b">3</div><div class="sc2"><h4>Isi Password Baru (min. 4 karakter)</h4><p>Masukkan password baru, konfirmasi ulang, lalu klik Simpan.</p></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 10: FAQ -->
+<div class="slide" id="s10">
+<div class="sl">
+<div class="sh"><div class="shi"><i class="fa-solid fa-circle-question"></i></div><div class="sht"><p>Slide 09 &middot; FAQ</p><h2>Pertanyaan Umum &amp; Tips Penggunaan</h2></div><div class="snb">09/10</div></div>
+<div class="sb">
+<div class="g2">
+<div style="display:flex;flex-direction:column;gap:10px">
+<p class="slb">Pertanyaan yang Sering Ditanyakan</p>
+<div class="c2"><h4 style="font-size:12.5px;color:#005aa9;margin-bottom:5px"><i class="fa-solid fa-question-circle"></i> Lupa menekan Jam Kembali?</h4><p style="font-size:11.5px;color:#475569;line-height:1.6">Hubungi Admin/Supervisor/Ketua Tim untuk menyelesaikan sesi via <b>Pengelolaan Sesi</b>. Atau sistem otomatis isi 16:00 saat hari berganti.</p></div>
+<div class="c2"><h4 style="font-size:12.5px;color:#005aa9;margin-bottom:5px"><i class="fa-solid fa-question-circle"></i> Data tidak muncul di Dashboard?</h4><p style="font-size:11.5px;color:#475569;line-height:1.6">Klik tombol Refresh &#8635; di header, atau tunggu 30 detik untuk auto-refresh. Pastikan koneksi internet stabil.</p></div>
+<div class="c2"><h4 style="font-size:12.5px;color:#005aa9;margin-bottom:5px"><i class="fa-solid fa-question-circle"></i> Hanya bisa lihat sebagian data?</h4><p style="font-size:11.5px;color:#475569;line-height:1.6">Karena Anda login sebagai <b>Ketua Tim</b> &mdash; data terbatas hanya anggota tim Anda. Hubungi Admin untuk perubahan role.</p></div>
+<div class="c2"><h4 style="font-size:12.5px;color:#005aa9;margin-bottom:5px"><i class="fa-solid fa-question-circle"></i> Bagaimana cara menambah pegawai baru?</h4><p style="font-size:11.5px;color:#475569;line-height:1.6">Anda dapat menghubungi <b>Administrator Tim Umum & Humas</b></p></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<p class="slb">Tips &amp; Panduan Terbaik</p>
+<div class="cal ok"><i class="fa-solid fa-star"></i><div><strong>Aktifkan Auto Refresh</strong> di Dashboard agar data selalu diperbarui otomatis setiap 30 detik tanpa refresh manual.</div></div>
+<div class="cal info"><i class="fa-solid fa-mobile-screen-button"></i><div><strong>Responsive Mobile</strong> &mdash; SIKEMAS bisa diakses dari smartphone. Buka sidebar dengan menekan tombol &#9776;.</div></div>
+<div class="cal warn"><i class="fa-solid fa-key"></i><div><strong>Keamanan Akun:</strong> Ganti password default segera setelah pertama login. Minimal 4 karakter.</div></div>
+<div class="c2" style="background:linear-gradient(135deg,#005aa9,#0077cc);border:none">
+<p style="font-size:10px;color:rgba(255,255,255,.7);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px">Kontak Bantuan</p>
+<p style="font-size:12.5px;color:#fff;font-weight:700"><i class="fa-solid fa-envelope" style="margin-right:7px;color:#fbbf24"></i>Tim Umum & Humas BPS Provinsi Kalimantan Barat</p>
+<p style="font-size:11px;color:rgba(255,255,255,.8);margin-top:5px">Untuk kendala teknis atau penambahan akun, hubungi admin sistem melalui koordinasi internal.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 11: PENUTUP -->
+<div class="slide" id="s11">
+<div style="background:linear-gradient(135deg,#003768,#005aa9,#0077cc);height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px;position:relative;overflow:hidden">
+<div style="position:absolute;width:480px;height:480px;background:rgba(255,255,255,.04);border-radius:50%;top:-140px;right:-140px;pointer-events:none"></div>
+<div style="position:absolute;width:280px;height:280px;background:rgba(242,148,0,.06);border-radius:50%;bottom:-70px;left:-70px;pointer-events:none"></div>
+<div style="width:74px;height:74px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.2);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:34px;color:#fff;margin-bottom:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)"><i class="fa-solid fa-circle-check"></i></div>
+<div style="background:rgba(242,148,0,.2);border:1px solid rgba(242,148,0,.35);color:#fbbf24;padding:5px 18px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:18px">Panduan Selesai</div>
+<h1 style="font-size:clamp(26px,4vw,46px);font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:12px;line-height:1.1">Terima Kasih!</h1>
+<p style="font-size:clamp(12px,1.8vw,16px);color:rgba(255,255,255,.75);max-width:460px;line-height:1.7;margin-bottom:36px">Semoga panduan ini membantu penggunaan <b>SIKEMAS</b> secara optimal. Untuk pertanyaan lebih lanjut, silakan hubungi Tim Umum dan Humas BPS Provinsi Kalimantan Barat.</p>
+<div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">
+<div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:12px 20px;border-radius:13px;font-size:12px;font-weight:700;color:rgba(255,255,255,.85)"><i class="fa-solid fa-building-columns" style="color:#fbbf24;margin-right:7px"></i>BPS Provinsi Kalimantan Barat</div>
+<div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:12px 20px;border-radius:13px;font-size:12px;font-weight:700;color:rgba(255,255,255,.85)"><i class="fa-solid fa-calendar" style="color:#fbbf24;margin-right:7px"></i>2026</div>
+</div>
+<p style="color:rgba(255,255,255,.3);font-size:10px;font-weight:600;margin-top:40px">&copy; 2026 Tim Umum &amp; Humas BPS Provinsi Kalimantan Barat &middot; SIKEMAS v1.0</p>
+</div>
+</div>
+
+</div>
+
+<div id="ctrl">
+<button class="bn" id="bp" onclick="go(-1)"><i class="fa-solid fa-chevron-left"></i><span>Sebelumnya</span></button>
+<div id="dots"></div>
+<div id="sc">1 / 11</div>
+<button class="bn" id="bn2" onclick="go(1)"><span>Selanjutnya</span><i class="fa-solid fa-chevron-right"></i></button>
+</div>
+
+<script>
+const N=11;let cur=1;
+const dc=document.getElementById('dots');
+for(let i=1;i<=N;i++){const d=document.createElement('button');d.className='dot'+(i===1?' active':'');d.title='Slide '+i;d.onclick=()=>gs(i);dc.appendChild(d);}
+function gs(n){if(n<1||n>N)return;const o=document.getElementById('s'+cur);const nx=document.getElementById('s'+n);o.classList.remove('active');o.classList.add('exit');setTimeout(()=>o.classList.remove('exit'),500);nx.classList.add('active');cur=n;upd();}
+function go(d){gs(cur+d);}
+function upd(){document.getElementById('bp').disabled=cur===1;document.getElementById('bn2').disabled=cur===N;document.getElementById('sc').textContent=cur+' / '+N;dc.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i+1===cur));}
+document.addEventListener('keydown',e=>{
+if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){e.preventDefault();go(1);}
+else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();go(-1);}
+else if(e.key==='Home')gs(1);
+else if(e.key==='End')gs(N);
+});
+upd();
+</script>
+</body>
+</html>

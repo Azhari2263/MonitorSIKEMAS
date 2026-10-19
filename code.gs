@@ -199,7 +199,8 @@ function saveRecord(data) {
       success: true, 
       message: "Rencana kegiatan berhasil disimpan! Sesi presensi Anda kini aktif.", 
       rowIndex: lastRow,
-      sessionId: sessionId
+      sessionId: sessionId,
+      autoJamKeluar: isAutoJamKeluarEnabled()
     };
   } catch (error) {
     return { success: false, message: "Gagal menyimpan: " + error.toString() };
@@ -274,9 +275,12 @@ function deleteRecordSafe(sessionId, employeeName) {
 // Memeriksa status sesi aktif pegawai di server secara real-time
 function checkSessionActive(sessionId, employeeName) {
   try {
+    // Jalankan auto jam keluar jika aktif sebelum memeriksa sesi
+    processAutoJamKeluar();
+
     const rowIndex = findRowBySessionOrEmployee(sessionId, employeeName);
     if (!rowIndex) {
-      return { found: false };
+      return { found: false, autoJamKeluar: isAutoJamKeluarEnabled() };
     }
     
     const sheet = getSheet();
@@ -288,7 +292,8 @@ function checkSessionActive(sessionId, employeeName) {
       nama: String(values[0] || "-"),
       waktuKeluar: String(displayValues[3] || "-"),
       waktuKembali: String(displayValues[4] || "-"),
-      keterangan: String(values[5] || "-")
+      keterangan: String(values[5] || "-"),
+      autoJamKeluar: isAutoJamKeluarEnabled()
     };
   } catch (error) {
     return { found: false, error: error.toString() };
@@ -299,6 +304,9 @@ function checkSessionActive(sessionId, employeeName) {
 function getRecordsInternal(employeeName) {
   try {
     if (!employeeName) return [];
+    // Jalankan auto jam keluar jika aktif sebelum mengambil data
+    processAutoJamKeluar();
+
     const sheet = getSheet();
     const range = sheet.getDataRange();
     const rows = range.getValues();
@@ -468,6 +476,15 @@ function doPost(e) {
       case 'updatePassword':
         result = updatePassword(requestData);
         break;
+      case 'getAutoJamKeluarSetting':
+        result = getAutoJamKeluarSetting();
+        break;
+      case 'setAutoJamKeluarSetting':
+        result = setAutoJamKeluarSetting(requestData);
+        break;
+      case 'triggerAutoJamKeluar':
+        result = { success: true, processed: processAutoJamKeluar() };
+        break;
       default:
         result = { success: false, message: "Aksi tidak dikenal: " + action };
     }
@@ -477,6 +494,234 @@ function doPost(e) {
 
   return ContentService.createTextOutput(JSON.stringify(result))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * =========================================================================
+ * FITUR AUTO JAM KELUAR (10 MENIT SETELAH RENCANA DISIMPAN)
+ * Pengaturan khusus role Admin & proses otomatisasi pencatatan jam keluar
+ * =========================================================================
+ */
+
+/**
+ * Memeriksa apakah fitur Auto Jam Keluar diaktifkan oleh Admin
+ */
+function isAutoJamKeluarEnabled() {
+  try {
+    const properties = PropertiesService.getScriptProperties();
+    return properties.getProperty("AUTO_JAM_KELUAR_ENABLED") === "true";
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Mengambil status pengaturan Auto Jam Keluar
+ */
+function getAutoJamKeluarSetting() {
+  try {
+    const enabled = isAutoJamKeluarEnabled();
+    return { success: true, enabled: enabled };
+  } catch (e) {
+    return { success: false, enabled: false, message: e.toString() };
+  }
+}
+
+/**
+ * Memvalidasi apakah NIP terdaftar sebagai Admin pada sheet User
+ */
+function verifyAdminRole(nip) {
+  try {
+    if (!nip) return false;
+    let doc;
+    try { doc = SpreadsheetApp.getActiveSpreadsheet(); } catch (e) { doc = null; }
+    if (!doc) {
+      const properties = PropertiesService.getScriptProperties();
+      const sheetId = properties.getProperty("SPREADSHEET_ID");
+      if (sheetId) {
+        try { doc = SpreadsheetApp.openById(sheetId); } catch(e) { doc = null; }
+      }
+    }
+    if (!doc) return false;
+    const sheet = doc.getSheetByName("User");
+    if (!sheet) return false;
+    const lastRow = sheet.getLastRow();
+    if (lastRow <= 1) return false;
+    const values = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
+    for (let i = 0; i < values.length; i++) {
+      const rowNip = String(values[i][2] || "").trim();
+      const rowRole = String(values[i][4] || "").trim();
+      if (rowNip === String(nip).trim() && rowRole === "Admin") {
+        return true;
+      }
+    }
+    return false;
+  } catch (e) {
+    Logger.log("Error verifyAdminRole: " + e.toString());
+    return false;
+  }
+}
+
+/**
+ * Menyimpan pengaturan Auto Jam Keluar (Khusus Role Admin)
+ */
+function setAutoJamKeluarSetting(data) {
+  try {
+    const role = String((data && data.role) || "").trim();
+    const nip = String((data && data.nip) || "").trim();
+
+    // 1. Validasi hak akses Admin
+    if (role !== "Admin") {
+      return { 
+        success: false, 
+        message: "Akses ditolak! Hanya role Admin yang berhak mengakses dan mengubah pengaturan ini." 
+      };
+    }
+
+    // 2. Validasi NIP di sheet User jika nip disediakan
+    if (nip) {
+      const isAdmin = verifyAdminRole(nip);
+      if (!isAdmin) {
+        return { 
+          success: false, 
+          message: "Akses ditolak! Akun dengan NIP tersebut tidak memiliki hak akses Admin." 
+        };
+      }
+    }
+
+    const enabled = data.enabled === true || data.enabled === "true" || data.enabled === 1 || data.enabled === "1";
+    const properties = PropertiesService.getScriptProperties();
+    properties.setProperty("AUTO_JAM_KELUAR_ENABLED", enabled ? "true" : "false");
+
+    // Kelola trigger terjadwal di Google Apps Script jika memungkinkan
+    setupAutoJamKeluarTrigger(enabled);
+
+    // Jika diaktifkan, langsung proses antrean sesi yang sudah melewati 10 menit
+    let processedCount = 0;
+    if (enabled) {
+      processedCount = processAutoJamKeluar();
+    }
+
+    return {
+      success: true,
+      enabled: enabled,
+      processedCount: processedCount,
+      message: `Fitur Auto Jam Keluar berhasil ${enabled ? "diaktifkan" : "dinonaktifkan"}.`
+    };
+  } catch (error) {
+    Logger.log("Error setAutoJamKeluarSetting: " + error.toString());
+    return { success: false, message: "Gagal menyimpan pengaturan: " + error.toString() };
+  }
+}
+
+/**
+ * Mengelola Google Apps Script time-driven trigger untuk menjalankan background job secara periodik
+ */
+function setupAutoJamKeluarTrigger(enabled) {
+  try {
+    const triggers = ScriptApp.getProjectTriggers();
+    for (let i = 0; i < triggers.length; i++) {
+      if (triggers[i].getHandlerFunction() === "runAutoJamKeluarJob") {
+        ScriptApp.deleteTrigger(triggers[i]);
+      }
+    }
+    if (enabled) {
+      ScriptApp.newTrigger("runAutoJamKeluarJob")
+        .timeBased()
+        .everyMinutes(1)
+        .create();
+    }
+  } catch (e) {
+    Logger.log("Notice trigger setup (fallback to on-request handling): " + e.toString());
+  }
+}
+
+/**
+ * Handler yang dipanggil oleh time-driven trigger Google Apps Script
+ */
+function runAutoJamKeluarJob() {
+  processAutoJamKeluar();
+}
+
+/**
+ * Menjalankan proses Auto Jam Keluar:
+ * Memeriksa seluruh baris di Log_SIKEMAS yang memiliki waktuKeluar === "-" dan waktuKembali === "-"
+ * serta sudah melewati 10 menit (600.000 ms) sejak rencana kegiatan disimpan (timestamp kolom G).
+ * Waktu Jam Keluar diisi dengan waktu tepat 10 menit setelah rencana disimpan tanpa duplikasi data.
+ */
+function processAutoJamKeluar() {
+  try {
+    if (!isAutoJamKeluarEnabled()) {
+      return 0;
+    }
+
+    // Gunakan LockService untuk mencegah duplikasi dan race conditions
+    const lock = LockService.getScriptLock();
+    if (!lock.tryLock(5000)) {
+      return 0;
+    }
+
+    let modifiedCount = 0;
+    try {
+      const sheet = getSheet();
+      const lastRow = sheet.getLastRow();
+      if (lastRow <= 1) return 0;
+
+      const dataRange = sheet.getRange(1, 1, lastRow, Math.max(sheet.getLastColumn(), 8));
+      const values = dataRange.getValues();
+      const displayValues = dataRange.getDisplayValues();
+      const now = new Date();
+      const TEN_MINUTES_MS = 10 * 60 * 1000;
+
+      for (let i = 1; i < values.length; i++) {
+        const raw = values[i];
+        const disp = displayValues[i];
+        const waktuKeluar = String(disp[3] || "-").trim();
+        const waktuKembali = String(disp[4] || "-").trim();
+        const rawTimestamp = raw[6];
+
+        if (waktuKeluar === "-" && waktuKembali === "-" && rawTimestamp) {
+          let recDate = null;
+          if (rawTimestamp instanceof Date) {
+            recDate = rawTimestamp;
+          } else {
+            const parsed = new Date(rawTimestamp);
+            if (!isNaN(parsed.getTime())) {
+              recDate = parsed;
+            }
+          }
+
+          if (recDate) {
+            const elapsedMs = now.getTime() - recDate.getTime();
+            if (elapsedMs >= TEN_MINUTES_MS) {
+              const autoKeluarDate = new Date(recDate.getTime() + TEN_MINUTES_MS);
+              let keluarStr = "";
+              try {
+                keluarStr = Utilities.formatDate(autoKeluarDate, Session.getScriptTimeZone() || "GMT+7", "HH:mm");
+              } catch (e) {
+                const hh = String(autoKeluarDate.getHours()).padStart(2, '0');
+                const mm = String(autoKeluarDate.getMinutes()).padStart(2, '0');
+                keluarStr = `${hh}:${mm}`;
+              }
+
+              sheet.getRange(i + 1, 4).setValue("'" + keluarStr);
+              values[i][3] = keluarStr;
+              displayValues[i][3] = keluarStr;
+              modifiedCount++;
+              Logger.log(`[Auto Jam Keluar] Baris ${i + 1} (${raw[0]}) berhasil dicatat keluar otomatis: ${keluarStr}`);
+            }
+          }
+        }
+      }
+    } finally {
+      lock.releaseLock();
+    }
+
+    return modifiedCount;
+  } catch (error) {
+    Logger.log("Error processAutoJamKeluar: " + error.toString());
+    return 0;
+  }
 }
 
 /**
@@ -530,6 +775,9 @@ function autoFixExpiredSessions(sheet, rows, displayRows) {
 // Mengambil semua riwayat dari database untuk Dashboard Monitoring
 function getAllRecords() {
   try {
+    // Jalankan auto jam keluar jika aktif sebelum mengambil data
+    processAutoJamKeluar();
+
     const sheet = getSheet();
     const range = sheet.getDataRange();
     const rows = range.getValues();
